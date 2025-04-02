@@ -1,6 +1,6 @@
 {
     "nodes":
-        [
+        [   
             {
                 "id": 0,
                 "role": "root",
@@ -19,14 +19,74 @@
                 "meanings": ["CRM"],
                 "targets": [0]
             },
-            ...altri nodi per i sistemi informatici
+            {
+                "id": 3,
+                "role": "intermediate",
+                "meanings": ["ERP", "SCM"],
+                "targets": [0]
+            },
+            {
+                "id": 4,
+                "role": "intermediate",
+                "meanings": ["WMS", "TMS"],
+                "targets": [0]
+            },
+            {
+                "id": 5,
+                "role": "intermediate",
+                "meanings": ["MES"],
+                "targets": [0]
+            },
+
             {
                 "id": 6,
                 "role": "final",
                 "meanings": ["IIoT"],
-                "targets": [1, 7]
+                "targets": [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13]
+            },
+            {
+                "id": 7,
+                "role": "final",
+                "meanings": ["Cloud Services"],
+                "targets": [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]
+            },
+            {
+                "id": 8,
+                "role": "final",
+                "meanings": ["AI", "CV", "PM", "RPA"],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13]
+            },
+            {
+                "id": 9,
+                "role": "final",
+                "meanings": ["Cyber Security"],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13]
+            },
+            {
+                "id": 10,
+                "role": "final",
+                "meanings": ["Robotics"],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13]
+            },
+            {
+                "id": 11,
+                "role": "final",
+                "meanings": ["AR", "VR"],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13]
+            },
+            {
+                "id": 12,
+                "role": "final",
+                "meanings": ["Digital Twin"],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13]
+            },
+            {
+                "id": 13,
+                "role": "final",
+                "meanings": ["DM", "BI"],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
             }
-            ...altri nodi per le tecnologie
+            
         ],
     "transitions": [
         {
@@ -39,6 +99,1248 @@
             "to": 0,
             "weight": 0.75
         },
-        ...altre transizioni costruite dalle matrici .csv
-    ],
+        {
+            "from": 3,
+            "to": 0,
+            "weight": 0.75
+        },
+        {
+            "from": 4,
+            "to": 0,
+            "weight": 0.75
+        },
+        {
+            "from": 5,
+            "to": 0,
+            "weight": 0.75
+        },
+
+        
+        {
+            "from": 6,
+            "to": 1,
+            "weight": 0.75
+        },
+        {
+            "from": 7,
+            "to": 1,
+            "weight": 0.75
+        },
+        {
+            "from": 8,
+            "to": 1,
+            "weight": 0.75
+        },
+        {
+            "from": 9,
+            "to": 1,
+            "weight": 0.75
+        },
+        {
+            "from": 11,
+            "to": 1,
+            "weight": 0.75
+        },
+        {
+            "from": 12,
+            "to": 1,
+            "weight": 0.75
+        },
+        {
+            "from": 13,
+            "to": 1,
+            "weight": 0.75
+        },
+
+
+        {
+            "from": 6,
+            "to": 2,
+            "weight": 0.75
+        },
+        {
+            "from": 7,
+            "to": 2,
+            "weight": 0.75
+        },
+        {
+            "from": 8,
+            "to": 2,
+            "weight": 0.75
+        },
+        {
+            "from": 9,
+            "to": 2,
+            "weight": 0.75
+        },
+        {
+            "from": 11,
+            "to": 2,
+            "weight": 0.75
+        },
+        {
+            "from": 13,
+            "to": 2,
+            "weight": 0.75
+        },
+
+
+        {
+            "from": 6,
+            "to": 3,
+            "weight": 0.75
+        },
+        {
+            "from": 7,
+            "to": 3,
+            "weight": 0.75
+        },
+        {
+            "from": 8,
+            "to": 3,
+            "weight": 0.75
+        },
+        {
+            "from": 9,
+            "to": 3,
+            "weight": 0.75
+        },
+        {
+            "from": 10,
+            "to": 3,
+            "weight": 0.75
+        },
+        {
+            "from": 11,
+            "to": 3,
+            "weight": 0.75
+        },
+        {
+            "from": 12,
+            "to": 3,
+            "weight": 0.75
+        },
+        {
+            "from": 13,
+            "to": 3,
+            "weight": 0.75
+        },
+
+        
+        {
+            "from": 6,
+            "to": 4,
+            "weight": 0.75
+        },
+        {
+            "from": 7,
+            "to": 4,
+            "weight": 0.75
+        },
+        {
+            "from": 8,
+            "to": 4,
+            "weight": 0.75
+        },
+        {
+            "from": 9,
+            "to": 4,
+            "weight": 0.75
+        },
+        {
+            "from": 10,
+            "to": 4,
+            "weight": 0.75
+        },
+        {
+            "from": 11,
+            "to": 4,
+            "weight": 0.75
+        },
+        {
+            "from": 12,
+            "to": 4,
+            "weight": 0.75
+        },
+        {
+            "from": 13,
+            "to": 4,
+            "weight": 0.75
+        },
+
+
+        {
+            "from": 6,
+            "to": 5,
+            "weight": 0.75
+        },
+        {
+            "from": 7,
+            "to": 5,
+            "weight": 0.75
+        },
+        {
+            "from": 8,
+            "to": 5,
+            "weight": 0.75
+        },
+        {
+            "from": 9,
+            "to": 5,
+            "weight": 0.75
+        },
+        {
+            "from": 10,
+            "to": 5,
+            "weight": 0.75
+        },
+        {
+            "from": 11,
+            "to": 5,
+            "weight": 0.75
+        },
+        {
+            "from": 12,
+            "to": 5,
+            "weight": 0.75
+        },
+        {
+            "from": 13,
+            "to": 5,
+            "weight": 0.75
+        },
+
+        
+        {
+            "from": 6,
+            "to": 1,
+            "weight": 0.75
+        },
+        {
+            "from": 6,
+            "to": 7,
+            "weight": 0.20833333333333334
+        },
+        {
+            "from": 6,
+            "to": 8,
+            "weight": 0.125
+        },
+        {
+            "from": 6,
+            "to": 9,
+            "weight": 0.125
+        },
+        {
+            "from": 6,
+            "to": 12,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 6,
+            "to": 13,
+            "weight": 0.125
+        },
+
+        {
+            "from": 7,
+            "to": 8,
+            "weight": 0.375
+        },
+        {
+            "from": 7,
+            "to": 9,
+            "weight": 0.4583333333333333
+        },
+        {
+            "from": 7,
+            "to": 11,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 7,
+            "to": 12,
+            "weight": 0.5416666666666666
+        },
+        {
+            "from": 7,
+            "to": 13,
+            "weight": 0.4166666666666667
+        },
+
+        
+        {
+            "from": 8,
+            "to": 7,
+            "weight": 0.25
+        },
+        {
+            "from": 8,
+            "to": 9,
+            "weight": 0.20833333333333334
+        },
+        {
+            "from": 8,
+            "to": 11,
+            "weight": 0.041666666666666664
+        },
+        {
+            "from": 8,
+            "to": 12,
+            "weight": 0.5
+        },
+        {
+            "from": 8,
+            "to": 13,
+            "weight": 0.2916666666666667
+        },
+
+
+        {
+            "from": 9,
+            "to": 7,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 9,
+            "to": 8,
+            "weight": 0.2916666666666667
+        },
+        {
+            "from": 9,
+            "to": 11,
+            "weight": 0.125
+        },
+        {
+            "from": 9,
+            "to": 12,
+            "weight": 0.375
+        },
+        {
+            "from": 9,
+            "to": 13,
+            "weight": 0.375
+        },
+
+
+        {
+            "from": 11,
+            "to": 7,
+            "weight": 0.125
+        },
+        {
+            "from": 11,
+            "to": 8,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 11,
+            "to": 9,
+            "weight": 0.125
+        },
+        {
+            "from": 11,
+            "to": 12,
+            "weight": 0.125
+        },
+
+
+        {
+            "from": 12,
+            "to": 7,
+            "weight": 0.25
+        },
+        {
+            "from": 12,
+            "to": 8,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 12,
+            "to": 9,
+            "weight": 0.2916666666666667
+        },
+        {
+            "from": 12,
+            "to": 11,
+            "weight": 0.25
+        },
+        {
+            "from": 12,
+            "to": 13,
+            "weight": 0.375
+        },
+
+
+        {
+            "from": 13,
+            "to": 6,
+            "weight": 0.125
+        },
+        {
+            "from": 13,
+            "to": 7,
+            "weight": 0.20833333333333334
+        },
+        {
+            "from": 13,
+            "to": 8,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 13,
+            "to": 9,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 13,
+            "to": 12,
+            "weight": 0.4166666666666667
+        },
+        
+
+        {
+            "from": 6,
+            "to": 7,
+            "weight": 0.25
+        },
+        {
+            "from": 6,
+            "to": 8,
+            "weight": 0.3125
+        },
+        {
+            "from": 6,
+            "to": 11,
+            "weight": 0.065
+        },
+        {
+            "from": 6,
+            "to": 13,
+            "weight": 0.3125
+        },
+
+
+        {
+            "from": 7,
+            "to": 6,
+            "weight": 0.25
+        },
+        {
+            "from": 7,
+            "to": 8,
+            "weight": 0.5625
+        },
+        {
+            "from": 7,
+            "to": 9,
+            "weight": 0.4375
+        },
+        {
+            "from": 7,
+            "to": 11,
+            "weight": 0.3125
+        },
+        {
+            "from": 7,
+            "to": 13,
+            "weight": 0.5
+        },
+
+
+        {
+            "from": 8,
+            "to": 7,
+            "weight": 0.1875
+        },
+        {
+            "from": 8,
+            "to": 9,
+            "weight": 0.1875
+        },
+        {
+            "from": 8,
+            "to": 11,
+            "weight": 0.25
+        },
+        {
+            "from": 8,
+            "to": 13,
+            "weight": 0.4375
+        },
+
+
+        {
+            "from": 9,
+            "to": 6,
+            "weight": 0.375
+        },
+        {
+            "from": 9,
+            "to": 7,
+            "weight": 0.625
+        },
+        {
+            "from": 9,
+            "to": 8,
+            "weight": 0.5
+        },
+        {
+            "from": 9,
+            "to": 11,
+            "weight": 0.1875
+        },
+        {
+            "from": 9,
+            "to": 13,
+            "weight": 0.75
+        },
+
+
+        {
+            "from": 11,
+            "to": 7,
+            "weight": 0.1875
+        },
+
+
+        {
+            "from": 13,
+            "to": 7,
+            "weight": 0.3125
+        },
+        {
+            "from": 13,
+            "to": 8,
+            "weight": 0.25
+        },
+        {
+            "from": 13,
+            "to": 9,
+            "weight": 0.4375
+        },
+        {
+            "from": 13,
+            "to": 11,
+            "weight": 0.125
+        },
+
+
+        {
+            "from": 6,
+            "to": 7,
+            "weight": 0.15
+        },
+        {
+            "from": 6,
+            "to": 8,
+            "weight": 0.45
+        },
+        {
+            "from": 6,
+            "to": 9,
+            "weight": 0.2
+        },
+        {
+            "from": 6,
+            "to": 10,
+            "weight": 0.1
+        },
+        {
+            "from": 6,
+            "to": 12,
+            "weight": 0.2
+        },
+        {
+            "from": 6,
+            "to": 13,
+            "weight": 0.15
+        },
+
+
+        {
+            "from": 7,
+            "to": 6,
+            "weight": 0.35
+        },
+        {
+            "from": 7,
+            "to": 8,
+            "weight": 0.65
+        },
+        {
+            "from": 7,
+            "to": 9,
+            "weight": 0.4
+        },
+        {
+            "from": 7,
+            "to": 10,
+            "weight": 0.2
+        },
+        {
+            "from": 7,
+            "to": 11,
+            "weight": 0.25
+        },
+        {
+            "from": 7,
+            "to": 12,
+            "weight": 0.25
+        },
+        {
+            "from": 7,
+            "to": 13,
+            "weight": 0.5
+        },
+
+
+        {
+            "from": 8,
+            "to": 6,
+            "weight": 0.15
+        },
+        {
+            "from": 8,
+            "to": 7,
+            "weight": 0.15
+        },
+        {
+            "from": 8,
+            "to": 9,
+            "weight": 0.15
+        },
+        {
+            "from": 8,
+            "to": 10,
+            "weight": 0.1
+        },
+        {
+            "from": 8,
+            "to": 11,
+            "weight": 0.15
+        },
+        {
+            "from": 8,
+            "to": 12,
+            "weight": 0.3
+        },
+        {
+            "from": 8,
+            "to": 13,
+            "weight": 0.2
+        },
+
+
+        {
+            "from": 9,
+            "to": 6,
+            "weight": 0.1
+        },
+        {
+            "from": 9,
+            "to": 7,
+            "weight": 0.7
+        },
+        {
+            "from": 9,
+            "to": 8,
+            "weight": 0.4
+        },
+        {
+            "from": 9,
+            "to": 10,
+            "weight": 0.2
+        },
+        {
+            "from": 9,
+            "to": 11,
+            "weight": 0.15
+        },
+        {
+            "from": 9,
+            "to": 12,
+            "weight": 0.25
+        },
+        {
+            "from": 9,
+            "to": 13,
+            "weight": 0.5
+        },
+
+
+        {
+            "from": 10,
+            "to": 7,
+            "weight": 0.15
+        },
+        {
+            "from": 10,
+            "to": 11,
+            "weight": 0.1
+        },
+        {
+            "from": 10,
+            "to": 12,
+            "weight": 0.05
+        },
+
+
+        {
+            "from": 11,
+            "to": 7,
+            "weight": 0.15
+        },
+        {
+            "from": 11,
+            "to": 10,
+            "weight": 0.1
+        },
+        {
+            "from": 11,
+            "to": 12,
+            "weight": 0.1
+        },
+        {
+            "from": 11,
+            "to": 13,
+            "weight": 0.1
+        },
+
+
+        {
+            "from": 12,
+            "to": 7,
+            "weight": 0.15
+        },
+        {
+            "from": 12,
+            "to": 8,
+            "weight": 0.1
+        },
+        {
+            "from": 12,
+            "to": 9,
+            "weight": 0.05
+        },
+        {
+            "from": 12,
+            "to": 11,
+            "weight": 0.1
+        },
+        {
+            "from": 12,
+            "to": 13,
+            "weight": 0.25
+        },
+
+
+        {
+            "from": 13,
+            "to": 6,
+            "weight": 0.15
+        },
+        {
+            "from": 13,
+            "to": 7,
+            "weight": 0.4
+        },
+        {
+            "from": 13,
+            "to": 8,
+            "weight": 0.5
+        },
+        {
+            "from": 13,
+            "to": 9,
+            "weight": 0.5
+        },
+        {
+            "from": 13,
+            "to": 11,
+            "weight": 0.25
+        },
+        {
+            "from": 13,
+            "to": 12,
+            "weight": 0.1
+        },
+
+
+        {
+            "from": 6,
+            "to": 8,
+            "weight": 0.25
+        },
+        {
+            "from": 6,
+            "to": 9,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 6,
+            "to": 10,
+            "weight": 0.5
+        },
+        {
+            "from": 6,
+            "to": 11,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 6,
+            "to": 12,
+            "weight": 0.5
+        },
+        {
+            "from": 6,
+            "to": 13,
+            "weight": 0.6666666666666666
+        },
+
+
+        {
+            "from": 7,
+            "to": 6,
+            "weight": 0.25
+        },
+        {
+            "from": 7,
+            "to": 8,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 7,
+            "to": 10,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 7,
+            "to": 11,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 7,
+            "to": 12,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 7,
+            "to": 13,
+            "weight": 0.3333333333333333
+        },
+
+
+        {
+            "from": 8,
+            "to": 10,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 8,
+            "to": 11,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 8,
+            "to": 12,
+            "weight": 0.25
+        },
+        {
+            "from": 8,
+            "to": 13,
+            "weight": 0.4166666666666667
+        },
+
+
+        {
+            "from": 9,
+            "to": 6,
+            "weight": 0.4166666666666667
+        },
+        {
+            "from": 9,
+            "to": 7,
+            "weight": 0.25
+        },
+        {
+            "from": 9,
+            "to": 8,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 9,
+            "to": 10,
+            "weight": 0.25
+        },
+        {
+            "from": 9,
+            "to": 12,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 9,
+            "to": 13,
+            "weight": 0.3333333333333333
+        },
+
+
+        {
+            "from": 10,
+            "to": 6,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 10,
+            "to": 8,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 10,
+            "to": 9,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 10,
+            "to": 11,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 10,
+            "to": 12,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 10,
+            "to": 13,
+            "weight": 0.5
+        },
+
+
+       {
+            "from": 11,
+            "to": 10,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 11,
+            "to": 12,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 11,
+            "to": 13,
+            "weight": 0.25
+        },
+
+
+        {
+            "from": 12,
+            "to": 6,
+            "weight": 0.25
+        },
+        {
+            "from": 12,
+            "to": 8,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 12,
+            "to": 9,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 12,
+            "to": 10,
+            "weight": 0.08333333333333333
+        },
+        {
+            "from": 12,
+            "to": 11,
+            "weight": 0.25
+        },
+        {
+            "from": 12,
+            "to": 13,
+            "weight": 0.4166666666666667
+        },
+
+
+        {
+            "from": 13,
+            "to": 8,
+            "weight": 0.16666666666666666
+        },
+        {
+            "from": 13,
+            "to": 9,
+            "weight": 0.3333333333333333
+        },
+        {
+            "from": 13,
+            "to": 12,
+            "weight": 0.16666666666666666
+        },
+
+
+        {
+            "from": 6,
+            "to": 7,
+            "weight": 0.1875
+        },
+        {
+            "from": 6,
+            "to": 8,
+            "weight": 0.5
+        },
+        {
+            "from": 6,
+            "to": 9,
+            "weight": 0.125
+        },
+        {
+            "from": 6,
+            "to": 10,
+            "weight": 0.375
+        },
+        {
+            "from": 6,
+            "to": 11,
+            "weight": 0.125
+        },
+        {
+            "from": 6,
+            "to": 12,
+            "weight": 0.3125
+        },
+        {
+            "from": 6,
+            "to": 13,
+            "weight": 0.5625
+        },
+
+
+        {
+            "from": 7,
+            "to": 6,
+            "weight": 0.1875
+        },
+        {
+            "from": 7,
+            "to": 8,
+            "weight": 0.5
+        },
+        {
+            "from": 7,
+            "to": 9,
+            "weight": 0.125
+        },
+        {
+            "from": 7,
+            "to": 10,
+            "weight": 0.175
+        },
+        {
+            "from": 7,
+            "to": 11,
+            "weight": 0.25
+        },
+        {
+            "from": 7,
+            "to": 12,
+            "weight": 0.3125
+        },
+        {
+            "from": 7,
+            "to": 13,
+            "weight": 0.375
+        },
+
+
+        {
+            "from": 8,
+            "to": 6,
+            "weight": 0.1875
+        },
+        {
+            "from": 8,
+            "to": 7,
+            "weight": 0.1875
+        },
+        {
+            "from": 8,
+            "to": 9,
+            "weight": 0.1875
+        },
+        {
+            "from": 8,
+            "to": 10,
+            "weight": 0.5
+        },
+        {
+            "from": 8,
+            "to": 11,
+            "weight": 0.25
+        },
+        {
+            "from": 8,
+            "to": 12,
+            "weight": 0.125
+        },
+        {
+            "from": 8,
+            "to": 13,
+            "weight": 0.3125
+        },
+
+
+        {
+            "from": 9,
+            "to": 6,
+            "weight": 0.6875
+        },
+        {
+            "from": 9,
+            "to": 7,
+            "weight": 0.5
+        },
+        {
+            "from": 9,
+            "to": 8,
+            "weight": 0.5
+        },
+        {
+            "from": 9,
+            "to": 10,
+            "weight": 0.3125
+        },
+        {
+            "from": 9,
+            "to": 11,
+            "weight": 0.3125
+        },
+        {
+            "from": 9,
+            "to": 12,
+            "weight": 0.4375
+        },
+        {
+            "from": 9,
+            "to": 13,
+            "weight": 0.5
+        },
+
+
+        {
+            "from": 10,
+            "to": 6,
+            "weight": 0.375
+        },
+        {
+            "from": 10,
+            "to": 7,
+            "weight": 0.0625
+        },
+        {
+            "from": 10,
+            "to": 8,
+            "weight": 0.5
+        },
+        {
+            "from": 10,
+            "to": 9,
+            "weight": 0.25
+        },
+        {
+            "from": 10,
+            "to": 13,
+            "weight": 0.1875
+        },
+
+
+        {
+            "from": 11,
+            "to": 6,
+            "weight": 0.1875
+        },
+        {
+            "from": 11,
+            "to": 7,
+            "weight": 0.1875
+        },
+        {
+            "from": 11,
+            "to": 8,
+            "weight": 0.1875
+        },
+        {
+            "from": 11,
+            "to": 9,
+            "weight": 0.1875
+        },
+        {
+            "from": 8,
+            "to": 10,
+            "weight": 0.0625
+        },
+        {
+            "from": 8,
+            "to": 12,
+            "weight": 0.1875
+        },
+
+
+        {
+            "from": 12,
+            "to": 6,
+            "weight": 0.1875
+        },
+        {
+            "from": 12,
+            "to": 9,
+            "weight": 0.25
+        },
+        {
+            "from": 12,
+            "to": 10,
+            "weight": 0.0625
+        },
+        {
+            "from": 12,
+            "to": 11,
+            "weight": 0.1875
+        },
+        {
+            "from": 12,
+            "to": 13,
+            "weight": 0.25
+        },
+
+
+        {
+            "from": 13,
+            "to": 6,
+            "weight": 0.25
+        },
+        {
+            "from": 13,
+            "to": 7,
+            "weight": 0.25
+        },
+        {
+            "from": 13,
+            "to": 8,
+            "weight": 0.3125
+        },
+        {
+            "from": 13,
+            "to": 9,
+            "weight": 0.25
+        },
+        {
+            "from": 8,
+            "to": 12,
+            "weight": 0.4375
+        }
+    ]
 }
