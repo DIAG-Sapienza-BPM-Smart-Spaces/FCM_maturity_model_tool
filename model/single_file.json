@@ -1,0 +1,44 @@
+{
+    "nodes":
+        [
+            {
+                "id": 0,
+                "role": "root",
+                "meanings": ["Smart Manufacturing"],
+                "targets": []
+            },
+            {
+                "id": 1,
+                "role": "intermediate",
+                "meanings": ["CAD", "CAM", "PLM"],
+                "targets": [0]
+            },
+            {
+                "id": 2,
+                "role": "intermediate",
+                "meanings": ["CRM"],
+                "targets": [0]
+            },
+            ...altri nodi per i sistemi informatici
+            {
+                "id": 6,
+                "role": "final",
+                "meanings": ["IIoT"],
+                "targets": [1, 7]
+            }
+            ...altri nodi per le tecnologie
+        ],
+    "transitions": [
+        {
+            "from": 1,
+            "to": 0,
+            "weight": 0.75
+        },
+        {
+            "from": 2,
+            "to": 0,
+            "weight": 0.75
+        },
+        ...altre transizioni costruite dalle matrici .csv
+    ],
+}
