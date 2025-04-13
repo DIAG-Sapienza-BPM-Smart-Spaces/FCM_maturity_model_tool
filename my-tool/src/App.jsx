@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Graph from './components/GraphVisualization';
 
 function App() {
-  const [graphData, setGraphData] = useState(null); // Stato per i dati del grafo
+  const [graphData, setGraphData] = useState(null); 
 
   useEffect(() => {
-    // Aggiungi l'event listener per il caricamento del file
     const fileInput = document.getElementById('fileInput');
     const handleFileChange = (event) => {
       const file = event.target.files[0];
@@ -13,8 +12,8 @@ function App() {
         const reader = new FileReader();
         reader.onload = (e) => {
           const data = JSON.parse(e.target.result);
-          console.log(data); // Debug: stampa il contenuto del file
-          setGraphData(data); // Aggiorna lo stato con i dati del grafo
+          //console.log(data);
+          setGraphData(data); 
         };
         reader.readAsText(file);
       }
@@ -22,17 +21,17 @@ function App() {
 
     fileInput.addEventListener('change', handleFileChange);
 
-    // Cleanup dell'event listener
+    
     return () => {
       fileInput.removeEventListener('change', handleFileChange);
     };
   }, []);
 
   const handleDeleteGraph = () => {
-    setGraphData(null); // Resetta la visualizzazione del grafo
+    setGraphData(null); 
     const fileInput = document.getElementById('fileInput');
     if (fileInput) {
-      fileInput.value = ''; // Resetta il valore dell'input file
+      fileInput.value = ''; 
     }
   };
 
@@ -41,7 +40,7 @@ function App() {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Dashboard di Manipolazione Grafo</h1>
         <input type="file" id="fileInput" />
-        {graphData && <Graph graphData={graphData} />} {/* Passa i dati al componente Graph */}
+        {graphData && <Graph graphData={graphData} />}
         {graphData && (
           <button
             onClick={handleDeleteGraph}

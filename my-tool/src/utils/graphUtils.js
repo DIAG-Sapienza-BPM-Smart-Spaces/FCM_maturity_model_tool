@@ -1,9 +1,5 @@
-// utils/graphUtils.js
-
-// Dati di esempio per inizializzare il grafo
 //import single_file from '../single_file.json';
   
-  // Funzione per preparare i dati del grafo per D3
 export const prepareGraphData = (nodes, transitions) => {
   const nodeData = nodes.map(n => ({
     id: n.id,
@@ -20,14 +16,12 @@ export const prepareGraphData = (nodes, transitions) => {
   return { nodeData, edgeData };
 };
 
-// Funzione per aggiornare il peso di un nodo
 export const updateNodeWeight = (nodes, nodeId, weight) => {
   return nodes.map(node =>
     node.id === nodeId ? { ...node, weight } : node
   );
 };
 
-// Funzione per aggiornare il peso di un arco
 export const updateEdgeWeight = (edges, source, target, weight) => {
   return edges.map(edge =>
     (edge.source === source && edge.target === target) ?
@@ -35,7 +29,6 @@ export const updateEdgeWeight = (edges, source, target, weight) => {
   );
 };
 
-// Funzioni per ottenere descrizioni degli elementi
 export const getNodeById = (nodes, id) => {
   return nodes.find(node => node.id === id);
 };
