@@ -67,13 +67,6 @@ export const updateNodeWeight = (nodes, nodeId, weight) => {
   );
 };
 
-/*export const updateEdgeWeight = (edges, source, target, weight) => {
-  return edges.map(edge =>
-    (edge.source === source && edge.target === target) ?
-      { ...edge, weight } : edge
-  );
-};*/
-
 export const getNodeById = (nodes, id) => {
   return nodes.find(node => node.id === id);
 };
