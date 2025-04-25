@@ -8,15 +8,31 @@ const GraphVisualization = ({ graphData }) => {
   const [selectedZone, setSelectedZone] = useState(null);
   
   const nodeConnections = useMemo(() => ({
-    0: [0, 1, 2, 3, 4, 5],
-    1: [1, 6, 7, 8, 9, 10, 11, 12], 
-    2: [2, 13, 14, 15, 16, 17, 18],
-    3: [3, 19, 20, 21, 22, 23, 24, 25, 26],
-    4: [4, 27, 28, 29, 30, 31, 32, 33, 34],
-    5: [5, 35, 36, 37, 38, 39, 40, 41, 42],
+    1: [6, 7, 8, 9, 10, 11, 12], 
+    2: [13, 14, 15, 16, 17, 18],
+    3: [19, 20, 21, 22, 23, 24, 25, 26],
+    4: [27, 28, 29, 30, 31, 32, 33, 34],
+    5: [35, 36, 37, 38, 39, 40, 41, 42],
   }), []);
 
-  useEffect(() => {
+  const getNodeAttributes = (weight) => {
+    switch (weight) {
+      case 'very low':
+        return { radius: 7.5, color: '#a3c1ad' }; // Verde chiaro
+      case 'low':
+        return { radius: 10, color: '#7fbf7f' }; // Verde medio
+      case 'medium':
+        return { radius: 12.5, color: '#5fa55a' }; // Verde scuro
+      case 'high':
+        return { radius: 15, color: '#3f8f3f' }; // Verde più scuro
+      case 'very high':
+        return { radius: 17.5, color: '#2f6f2f' }; // Verde intenso
+      default: 
+        return { radius: 5, color: '#000' }; // Nero per "none"
+    }
+  };
+
+  useEffect(() => {         //SUB-GRAPH
     if (!selectedZone) return;
   
     // Ottieni i nodi collegati alla zona selezionata
@@ -70,32 +86,31 @@ const GraphVisualization = ({ graphData }) => {
       .data(connectedNodes)
       .enter()
       .append('circle')
-      .attr('r', d => Math.max(5, d.weight * 2)) // Dimensione proporzionale al peso
-      .attr('fill', d => (selectedNode && selectedNode.id === d.id) ? '#f006f0' : '#007bff') // Nodo selezionato in evidenza
+      .attr('r', d => getNodeAttributes(d.weight).radius) // Dimensione proporzionale al peso
+      .attr('fill', d => getNodeAttributes(d.weight).color) // Colore proporzionale al peso
       .attr('stroke', '#fff')
       .attr('stroke-width', 2)
+      .style("cursor", "pointer")
+      .on('click', (event, d) => {
+        setSelectedNode(d); // Aggiorna il nodo selezionato
+        event.stopPropagation(); // Ferma la propagazione dell'evento
+      })
       .call(d3.drag()
-        .on('start', (event, d) => {
-          if (selectedNode && selectedNode.id === d.id) {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-          }
-        })
-        .on('drag', (event, d) => {
-          if (selectedNode && selectedNode.id === d.id) {
-            d.fx = event.x;
-            d.fy = event.y;
-          }
-        })
-        .on('end', (event, d) => {
-          if (selectedNode && selectedNode.id === d.id) {
-            if (!event.active) simulation.alphaTarget(0);
-            d.fx = null; // Rilascia il nodo
-            d.fy = null;
-          }
-        })
-      );
+      .on('start', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      })
+      .on('drag', (event, d) => {
+        d.fx = event.x;
+        d.fy = event.y;
+      })
+      .on('end', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0);
+        // Mantieni la posizione finale del nodo
+        d.fx = d.x;
+        d.fy = d.y;
+      }));
   
     // Disegna le etichette
     const labels = graphGroup.append('g')
@@ -160,9 +175,11 @@ const GraphVisualization = ({ graphData }) => {
     svg.call(zoom); // Applica lo zoom all'SVG
 
     const simulation = d3.forceSimulation(nodeData)
-      .force("link", d3.forceLink(edgeData).id(d => d.id).distance(100))
-      .force("charge", d3.forceManyBody().strength(-150))
-      .force("center", d3.forceCenter(width / 2, height / 2));
+      .force("link", d3.forceLink(edgeData).id(d => d.id).distance(300)) // Aumenta la distanza tra i collegamenti
+      .force("charge", d3.forceManyBody().strength(-1500)) // Aumenta la forza di repulsione
+      .force("center", d3.forceCenter(width / 2, height / 2)) // Centra il grafo
+      .force("x", d3.forceX(width / 2).strength(0.1)) // Forza verso il centro orizzontale
+      .force("y", d3.forceY(height / 2).strength(0.1)); // Forza verso il centro verticale
 
     // Arresta la simulazione e fissa i nodi
     simulation.on('end', () => {
@@ -183,43 +200,32 @@ const GraphVisualization = ({ graphData }) => {
       .attr('stroke', '#a37f1f')
       .attr("stroke-opacity", 0.6)
 
-
-      const node = graphGroup.append('g')
+    const node = graphGroup.append('g')
       .attr('class', 'nodes')
       .selectAll('circle')
       .data(nodeData)
       .enter()
       .append('circle')
       .attr('r', 15)
-      .attr('fill', d => (selectedNode && selectedNode.id === d.id) ? '#f006f0' : '#0ff7aa')
-      .style("cursor", "pointer")
-      .on('click', (event, d) => {
-        // Verifica se il nodo appartiene alla zona selezionata
-        const connectedNodeIds = selectedZone ? nodeConnections[selectedZone.id] || [] : [];
-        if (!connectedNodeIds.includes(d.id)) {
-          // Deseleziona la zona se il nodo non appartiene
-          setSelectedZone(null);
-        }
-        setSelectedNode(d); // Aggiorna il nodo selezionato
+      .attr('fill', '#0ff7aa')
+      .style("cursor", "default") // Disabilita il puntatore interattivo
+      .call(d3.drag()
+      .on('start', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
-        event.stopPropagation(); // Ferma la propagazione dell'evento
       })
-      .call(d3.drag()
-        .on('start', (event, d) => {
-          if (!event.active) simulation.alphaTarget(0.3).restart();
-          d.fx = d.x;
-          d.fy = d.y;
-        })
-        .on('drag', (event, d) => {
-          d.fx = event.x;
-          d.fy = event.y;
-        })
-        .on('end', (event, d) => {
-          if (!event.active) simulation.alphaTarget(0);
-          d.fx = null; // Rilascia il nodo
-          d.fy = null;
-        }));
+      .on('drag', (event, d) => {
+        d.fx = event.x;
+        d.fy = event.y;
+      })
+      .on('end', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0);
+        // Mantieni la posizione finale del nodo
+        d.fx = d.x;
+        d.fy = d.y;
+      }));
+
 
     const labels = graphGroup.append('g')
       .attr('class', 'labels')
@@ -250,7 +256,11 @@ const GraphVisualization = ({ graphData }) => {
     simulation.alpha(1).restart();
   }, [graphData, selectedNode, nodeConnections, selectedZone]); // Ricalcola il grafo quando i dati cambiano
   
-  const zones = graphData.nodes.filter(node => node.role === 'root' || node.role === 'intermediate'); 
+  const zones = graphData.nodes.filter(
+    node =>
+      (node.role === 'root' || node.role === 'intermediate') &&
+      !node.meanings.includes('Smart Manufacturing')
+  );
     
   const handleZoneClick = (zone) => {
     if (selectedZone?.id === zone.id) {
@@ -261,12 +271,20 @@ const GraphVisualization = ({ graphData }) => {
       // Altrimenti, seleziona la nuova zona
       setSelectedZone(zone);
       setSelectedNode(null); // Resetta il nodo selezionato
+  
+      // Resetta le posizioni dei nodi del sotto-grafo
+      const connectedNodeIds = nodeConnections[zone.id] || [];
+      const connectedNodes = graphData.nodes.filter(node => connectedNodeIds.includes(node.id));
+      connectedNodes.forEach(node => {
+        node.fx = null;
+        node.fy = null;
+      });
     }
   };
 
   // Funzione per aggiornare il peso del nodo selezionato
   const handleUpdateWeight = (nodeId, newWeight) => {
-    if(selectedNode) {
+    if (selectedNode && selectedNode.role === 'final') {
       const nodeIndex = initialNodes.findIndex(node => node.id === selectedNode.id);
       if (nodeIndex !== -1) {
         initialNodes[nodeIndex].weight = selectedNode.weight; // Aggiorna il peso
@@ -274,14 +292,14 @@ const GraphVisualization = ({ graphData }) => {
         const updatedNodes = graphData.nodes.map(node =>
           node.id === nodeId ? { ...node, weight: newWeight } : node
         );
-        console.log('Nodi aggiornati:', updatedNodes);
-        console.log('Nodi aggiornati:', initialNodes); // Per verificare l'aggiornamento
+        /*console.log('Nodi aggiornati:', updatedNodes);
+        console.log('Nodi aggiornati:', initialNodes); */// Per verificare l'aggiornamento
         
         graphData.nodes = updatedNodes; // Aggiorna i nodi nel grafo
         setSelectedNode(prevNode => ({ ...prevNode, weight: newWeight })); // Aggiorna il nodo selezionato
       }
 
-      alert(`Peso del nodo ${selectedNode.meanings?.join(', ')} aggiornato a ${selectedNode.weight}`);
+      alert(`Peso del nodo ${selectedNode.meanings?.join(', ')} aggiornato a ${newWeight}`);
     }
   };
 
@@ -332,22 +350,26 @@ const GraphVisualization = ({ graphData }) => {
 
       {/* Zona modifica peso */}
       {selectedNode && (
-        <div id="cambio" className="mt-4 bg-white p-4 rounded shadow-md">
-        <h3 className="text-lg font-bold mb-2">Modifica Peso</h3>
+        <div id="cambio" className="mt-4">
+        <h3>Modifica Peso</h3>
         <div className="weight-section">
           <label htmlFor="weight-input">Nodo: {selectedNode.meanings?.join(', ')}</label>
-          <input
+          <select
             id="weight-input"
-            type="number"
-            value={selectedNode.weight || ''}
+            value={selectedNode.weight || 'none'}
             onChange={(e) =>
-              setSelectedNode({ ...selectedNode, weight: parseFloat(e.target.value) || 0 })
+              setSelectedNode({ ...selectedNode, weight: e.target.value })
             }
-            className="w-24 p-2 border rounded"
-          />
+          >
+            <option value="none">None</option>
+            <option value="very low">Very Low</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="very high">Very High</option>
+          </select>
           <button
             onClick={() => handleUpdateWeight(selectedNode.id, selectedNode.weight)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
           >
             Aggiorna
           </button>

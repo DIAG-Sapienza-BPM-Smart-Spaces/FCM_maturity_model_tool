@@ -21,13 +21,14 @@ code {
   font-family: 'Arial', sans-serif;
   color: #333;
   line-height: 1.6;
+  margin: 20px;
 }
 
 .box-title {
   font-size: 24px;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   color: #007bff;
 }
 
@@ -48,19 +49,20 @@ h3 {
 .zone-buttons button {
   flex: 1 1 calc(25% - 15px); /* Ogni pulsante occupa il 25% della larghezza */
   min-width: 120px; /* Larghezza minima */
-  padding: 10px;
+  padding: 10px 20px;
+  margin: 5px;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
   background-color: #f0f0f0;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .zone-buttons button:hover {
-  background-color: #e0e0e0;
-  border-color: #bbb;
+  background-color: #007bff;
+  color: white;
 }
 
 .zone-buttons button.bg-blue-500 {
@@ -99,38 +101,46 @@ h3 {
 
 .weight-section {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  gap: 15px; /* Spaziatura tra gli elementi */
+  justify-content: center;
 }
 
 .weight-section label {
   flex: 1 1 100px; /* Larghezza minima per l'etichetta */
   text-align: right;
+  font-size: 16px; /* Dimensione del testo */
   font-weight: bold;
+  color: #555; /* Colore del testo */
 }
 
-.weight-section input {
-  flex: 1 1 150px; /* Larghezza minima per l'input */
-  padding: 8px;
+.weight-section select {
+  padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 5px;
   font-size: 14px;
+  background-color: #f9f9f9; /* Sfondo chiaro */
+  transition: border-color 0.3s ease;
+}
+
+.weight-section select:focus {
+  border-color: #007bff; /* Colore del bordo al focus */
+  outline: none;
 }
 
 .weight-section button {
-  flex: 1 1 auto;
-  padding: 10px 15px;
+  padding: 10px 20px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+
 
 .weight-section button:hover {
   background-color: #0056b3;
@@ -155,6 +165,7 @@ h3 {
   border-radius: 8px;
   background-color: #f9f9f9;
   padding: 10px;
+  border-right: 1px solid #ddd; 
 }
 
 .svg-column {
@@ -167,6 +178,7 @@ h3 {
   background-color: #f9f9f9;
   height: 300px; /* Altezza fissa per il contenitore */
   overflow: hidden; /* Evita lo scrolling */
+  padding: 10px;
 }
 
 #subgraph {
@@ -184,9 +196,28 @@ h3 {
   overflow: hidden;
 }
 
-#cambio{
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
+#cambio {
+  background-color: #ffffff; /* Sfondo bianco */
+  border: 1px solid #ddd; /* Bordo sottile */
+  border-radius: 8px; /* Angoli arrotondati */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombra */
+  padding: 20px; /* Spaziatura interna */
+  margin-top: 20px; /* Spaziatura superiore */
+}
+
+#cambio h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Spaziatura tra l'icona e il testo */
+  font-size: 20px; /* Dimensione del titolo */
+  font-weight: bold;
+  color: #333; /* Colore del testo */
+  margin-bottom: 15px; /* Spaziatura sotto il titolo */
+}
+
+#cambio h3::before {
+  content: '⚙️'; /* Icona accanto al titolo */
+  font-size: 24px; /* Dimensione dell'icona */
 }
 
 @media (max-width: 768px) {
