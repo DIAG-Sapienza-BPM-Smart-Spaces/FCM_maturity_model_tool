@@ -15,7 +15,7 @@ const ElementsList = ({ nodes, connectedNodeIds, onSelectNode }) => {
         >
           <div className="flex justify-between">
             <span>{node.meanings.join(', ')}</span>
-            <span>Peso: {node.weight}</span>
+            <span>Weight: {node.weight || 'None'}</span>
           </div>
         </div>
       ))}

@@ -32,6 +32,38 @@ code {
   color: #007bff;
 }
 
+.toggle-checkbox {
+  width: 40px;
+  height: 20px;
+  appearance: none;
+  background-color: #ff0000;
+  border-radius: 10px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-checkbox:checked {
+  background-color: #4caf50;
+}
+
+.toggle-checkbox:before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-checkbox:checked:before {
+  transform: translateX(20px);
+}
+
 h3 {
   font-size: 18px;
   font-weight: bold;
@@ -145,6 +177,34 @@ h3 {
 .weight-section button:hover {
   background-color: #0056b3;
 }
+
+/*.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fixed-footer button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.fixed-footer button:hover {
+  background-color: #0056b3;
+}*/
 
 .table-svg-container {
   display: flex;
