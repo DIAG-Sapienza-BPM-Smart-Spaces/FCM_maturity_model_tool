@@ -1,0 +1,260 @@
+[
+    {
+        "id": 1,
+        "label": "CAD, CAM, PLM",
+        "weight": "VH",
+        "numeric_weight": 0.80205
+    },
+    {
+        "id": 6,
+        "label": "IIoT",
+        "weight": "M",
+        "numeric_weight": 0.51355
+    },
+    {
+        "id": 7,
+        "label": "Cloud Services",
+        "weight": "H",
+        "numeric_weight": 0.60813
+    },
+    {
+        "id": 8,
+        "label": "AI, CV, PM, RPA",
+        "weight": "H",
+        "numeric_weight": 0.62732
+    },
+    {
+        "id": 9,
+        "label": "Cyber Security",
+        "weight": "H",
+        "numeric_weight": 0.62555
+    },
+    {
+        "id": 10,
+        "label": "AR, VR",
+        "weight": "M",
+        "numeric_weight": 0.55229
+    },
+    {
+        "id": 11,
+        "label": "Digital Twin",
+        "weight": "H",
+        "numeric_weight": 0.66084
+    },
+    {
+        "id": 12,
+        "label": "DM, BI",
+        "weight": "H",
+        "numeric_weight": 0.63583
+    },
+    {
+        "id": 2,
+        "label": "CRM",
+        "weight": "H",
+        "numeric_weight": 0.74375
+    },
+    {
+        "id": 13,
+        "label": "IIoT",
+        "weight": "M",
+        "numeric_weight": 0.541
+    },
+    {
+        "id": 14,
+        "label": "Cloud Services",
+        "weight": "M",
+        "numeric_weight": 0.59573
+    },
+    {
+        "id": 15,
+        "label": "AI, CV, PM, RPA",
+        "weight": "H",
+        "numeric_weight": 0.60082
+    },
+    {
+        "id": 16,
+        "label": "Cyber Security",
+        "weight": "M",
+        "numeric_weight": 0.5833
+    },
+    {
+        "id": 17,
+        "label": "AR, VR",
+        "weight": "M",
+        "numeric_weight": 0.56534
+    },
+    {
+        "id": 18,
+        "label": "DM, BI",
+        "weight": "H",
+        "numeric_weight": 0.62053
+    },
+    {
+        "id": 3,
+        "label": "ERP, SCM",
+        "weight": "H",
+        "numeric_weight": 0.7686
+    },
+    {
+        "id": 19,
+        "label": "IIoT",
+        "weight": "M",
+        "numeric_weight": 0.55149
+    },
+    {
+        "id": 20,
+        "label": "Cloud Services",
+        "weight": "M",
+        "numeric_weight": 0.59958
+    },
+    {
+        "id": 21,
+        "label": "AI, CV, PM, RPA",
+        "weight": "H",
+        "numeric_weight": 0.61781
+    },
+    {
+        "id": 22,
+        "label": "Cyber Security",
+        "weight": "M",
+        "numeric_weight": 0.58163
+    },
+    {
+        "id": 23,
+        "label": "Robotics",
+        "weight": "M",
+        "numeric_weight": 0.54061
+    },
+    {
+        "id": 24,
+        "label": "AR, VR",
+        "weight": "M",
+        "numeric_weight": 0.56185
+    },
+    {
+        "id": 25,
+        "label": "Digital Twin",
+        "weight": "M",
+        "numeric_weight": 0.57392
+    },
+    {
+        "id": 26,
+        "label": "DM, BI",
+        "weight": "M",
+        "numeric_weight": 0.59842
+    },
+    {
+        "id": 4,
+        "label": "WMS, TMS",
+        "weight": "L",
+        "numeric_weight": 0.2622
+    },
+    {
+        "id": 27,
+        "label": "IIoT",
+        "weight": "M",
+        "numeric_weight": 0.44998
+    },
+    {
+        "id": 28,
+        "label": "Cloud Services",
+        "weight": "M",
+        "numeric_weight": 0.48915
+    },
+    {
+        "id": 29,
+        "label": "AI, CV, PM, RPA",
+        "weight": "M",
+        "numeric_weight": 0.4475
+    },
+    {
+        "id": 30,
+        "label": "Cyber Security",
+        "weight": "M",
+        "numeric_weight": 0.44853
+    },
+    {
+        "id": 31,
+        "label": "Robotics",
+        "weight": "M",
+        "numeric_weight": 0.44567
+    },
+    {
+        "id": 32,
+        "label": "AR, VR",
+        "weight": "M",
+        "numeric_weight": 0.46641
+    },
+    {
+        "id": 33,
+        "label": "Digital Twin",
+        "weight": "M",
+        "numeric_weight": 0.43033
+    },
+    {
+        "id": 34,
+        "label": "DM, BI",
+        "weight": "L",
+        "numeric_weight": 0.38529
+    },
+    {
+        "id": 5,
+        "label": "MES",
+        "weight": "H",
+        "numeric_weight": 0.74267
+    },
+    {
+        "id": 35,
+        "label": "IIoT",
+        "weight": "M",
+        "numeric_weight": 0.58916
+    },
+    {
+        "id": 36,
+        "label": "Cloud Services",
+        "weight": "M",
+        "numeric_weight": 0.56326
+    },
+    {
+        "id": 37,
+        "label": "AI, CV, PM, RPA",
+        "weight": "H",
+        "numeric_weight": 0.60677
+    },
+    {
+        "id": 38,
+        "label": "Cyber Security",
+        "weight": "M",
+        "numeric_weight": 0.56555
+    },
+    {
+        "id": 39,
+        "label": "Robotics",
+        "weight": "M",
+        "numeric_weight": 0.57344
+    },
+    {
+        "id": 40,
+        "label": "AR, VR",
+        "weight": "M",
+        "numeric_weight": 0.55222
+    },
+    {
+        "id": 41,
+        "label": "Digital Twin",
+        "weight": "M",
+        "numeric_weight": 0.58269
+    },
+    {
+        "id": 42,
+        "label": "DM, BI",
+        "weight": "H",
+        "numeric_weight": 0.60004
+    },
+    {
+        "id": 0,
+        "label": "Smart Manufacturing",
+        "weight": "H",
+        "numeric_weight": 0.6638539999999999
+    }
+]

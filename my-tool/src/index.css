@@ -74,13 +74,13 @@ h3 {
 .zone-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px; /* Spaziatura tra i pulsanti */
-  justify-content: center; /* Centrare i pulsanti */
+  gap: 15px; 
+  justify-content: center; 
 }
 
 .zone-buttons button {
-  flex: 1 1 calc(25% - 15px); /* Ogni pulsante occupa il 25% della larghezza */
-  min-width: 120px; /* Larghezza minima */
+  flex: 1 1 calc(25% - 15px); 
+  min-width: 120px; 
   padding: 10px 20px;
   margin: 5px;
   text-align: center;
@@ -108,7 +108,7 @@ h3 {
 }
 
 .table-container {
-  overflow-x: auto; /* Abilita lo scrolling orizzontale su schermi piccoli */
+  overflow-x: auto;
 }
 
 .table-container div {
@@ -135,16 +135,16 @@ h3 {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 15px; /* Spaziatura tra gli elementi */
+  gap: 15px; 
   justify-content: center;
 }
 
 .weight-section label {
-  flex: 1 1 100px; /* Larghezza minima per l'etichetta */
+  flex: 1 1 100px; 
   text-align: right;
-  font-size: 16px; /* Dimensione del testo */
+  font-size: 16px;
   font-weight: bold;
-  color: #555; /* Colore del testo */
+  color: #555;
 }
 
 .weight-section select {
@@ -152,12 +152,12 @@ h3 {
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 14px;
-  background-color: #f9f9f9; /* Sfondo chiaro */
+  background-color: #f9f9f9; 
   transition: border-color 0.3s ease;
 }
 
 .weight-section select:focus {
-  border-color: #007bff; /* Colore del bordo al focus */
+  border-color: #007bff; 
   outline: none;
 }
 
@@ -178,33 +178,6 @@ h3 {
   background-color: #0056b3;
 }
 
-/*.fixed-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #f9f9f9;
-  border-top: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.fixed-footer button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.fixed-footer button:hover {
-  background-color: #0056b3;
-}*/
 
 .table-svg-container {
   display: flex;
@@ -219,8 +192,8 @@ h3 {
 
 .table-column {
   flex: 1;
-  max-height: 300px; /* Altezza massima per la tabella */
-  overflow-y: auto; /* Abilita lo scrolling verticale */
+  max-height: none;
+  overflow-y: visible;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
@@ -236,19 +209,21 @@ h3 {
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
-  height: 300px; /* Altezza fissa per il contenitore */
-  overflow: hidden; /* Evita lo scrolling */
+  height: 300px; 
+  overflow: hidden; 
   padding: 10px;
 }
 
 #subgraph {
   width: 100%;
   height: 100%;
+  max-height: 500px;
+  overflow: hidden; 
 }
 
 #graph {
   width: 100%;
-  height: 50vh; /* Altezza dinamica */
+  height: 50vh; 
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
@@ -257,36 +232,80 @@ h3 {
 }
 
 #cambio {
-  background-color: #ffffff; /* Sfondo bianco */
-  border: 1px solid #ddd; /* Bordo sottile */
-  border-radius: 8px; /* Angoli arrotondati */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombra */
-  padding: 20px; /* Spaziatura interna */
-  margin-top: 20px; /* Spaziatura superiore */
+  background-color: #ffffff;
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  padding: 20px;
+  margin-top: 20px;
 }
 
 #cambio h3 {
   display: flex;
   align-items: center;
-  gap: 10px; /* Spaziatura tra l'icona e il testo */
-  font-size: 20px; /* Dimensione del titolo */
+  gap: 10px; 
+  font-size: 20px; 
   font-weight: bold;
-  color: #333; /* Colore del testo */
-  margin-bottom: 15px; /* Spaziatura sotto il titolo */
+  color: #333; 
+  margin-bottom: 15px; 
 }
 
 #cambio h3::before {
-  content: '⚙️'; /* Icona accanto al titolo */
-  font-size: 24px; /* Dimensione dell'icona */
+  content: '⚙️'; 
+  font-size: 24px; 
+}
+
+#python-execution {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+#python-execution h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+#python-execution button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#python-execution button:hover {
+  background-color: #0056b3;
+}
+
+#generated-graph-container {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+}
+
+#generated-graph {
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 @media (max-width: 768px) {
   .zone-buttons button {
-    flex: 1 1 calc(50% - 10px); /* Ogni pulsante occupa metà della larghezza */
+    flex: 1 1 calc(50% - 10px); 
   }
 
   .weight-section {
-    flex-direction: column; /* Disposizione verticale */
+    flex-direction: column; 
     align-items: flex-start;
   }
 
@@ -297,7 +316,7 @@ h3 {
 
   .weight-section input,
   .weight-section button {
-    width: 100%; /* Larghezza completa */
+    width: 100%; 
   }
 }
 
