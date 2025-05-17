@@ -4,6 +4,7 @@ import { prepareGraphData, initialNodes as initialNodesData} from '../utils/grap
 import ElementsList from './ElementsList';
 
 const GraphVisualization = ({ graphData }) => {
+  const [shouldAnimate, setShouldAnimate] = useState(true);
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedZone, setSelectedZone] = useState(null);
   const [initialNodes, setInitialNodes] = useState(initialNodesData);
@@ -21,7 +22,7 @@ const GraphVisualization = ({ graphData }) => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [showGeneratedGraph, setShowGeneratedGraph] = useState(false);
-
+  const [selectedGlobalWeight, setSelectedGlobalWeight] = useState('NA');
   
   const nodeConnections = useMemo(() => ({
     1: [6, 7, 8, 9, 10, 11, 12], 
@@ -251,28 +252,11 @@ const GraphVisualization = ({ graphData }) => {
     
   }, [enabledSections, filteredGraphData, selectedZone, graphData, nodeConnections, selectedNode]); 
 
-  useEffect(() => {     //MAIN GRAPH  
+  const renderMainGraph = useCallback(() => {     //MAIN GRAPH  
     if (!filteredGraphData || !filteredGraphData.nodes || !filteredGraphData.transitions) {
       console.error('Graph\'s values not valid:', filteredGraphData);
       return;
     } 
-
-    const getNodeAttributesLocal = (weight) => {
-      switch (weight) {
-        case 'VL':
-          return { radius: 7.5, color: '#a3c1ad' }; // Verde chiaro
-        case 'L':
-          return { radius: 10, color: '#7fbf7f' }; // Verde medio
-        case 'M':
-          return { radius: 12.5, color: '#5fa55a' }; // Verde scuro
-        case 'H':
-          return { radius: 15, color: '#3f8f3f' }; // Verde più scuro
-        case 'VH':
-          return { radius: 17.5, color: '#2f6f2f' }; // Verde intenso
-        default: 
-          return { radius: 5, color: '#000' }; // Nero per "none"
-      }
-    };
 
     const { nodeData, edgeData } = prepareGraphData(filteredGraphData.nodes, filteredGraphData.transitions);
 
@@ -302,11 +286,20 @@ const GraphVisualization = ({ graphData }) => {
     svg.call(zoom); 
 
     const simulation = d3.forceSimulation(nodeData)
-      .force("link", d3.forceLink(edgeData).id(d => d.id).distance(300)) 
-      .force("charge", d3.forceManyBody().strength(-1500))  
-      .force("center", d3.forceCenter(width / 2, height / 2)) 
-      .force("x", d3.forceX(width / 2).strength(0.1)) 
-      .force("y", d3.forceY(height / 2).strength(0.1)); 
+      .force("link", d3.forceLink(edgeData).id(d => d.id).distance(250))
+      .force("charge", d3.forceManyBody().strength(-1200))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      // Forza radiale: i nodi intermedi si dispongono a raggiera
+      .force("radial", d3.forceRadial(
+        d => {
+          if (d.role === "root") return 0; // root al centro
+          if (d.role === "intermediate") return 350; // intermedi a una certa distanza
+          return 500; // final più esterni
+        },
+        width / 2,
+        height / 2
+      ).strength(0.9))
+      .force("collision", d3.forceCollide().radius(d => getNodeAttributes(d.weight).radius + 5).iterations(5));
 
     simulation.on('end', () => {
       nodeData.forEach(d => {
@@ -323,7 +316,7 @@ const GraphVisualization = ({ graphData }) => {
       .enter()
       .append('line')
       .attr('stroke-width', d => Math.sqrt(d.weight) * 5)
-      .attr('stroke', '#a37f1f')
+      .attr('stroke', '#7dafff')
       .attr("stroke-opacity", 0.6)
 
     const node = graphGroup.append('g')
@@ -332,8 +325,8 @@ const GraphVisualization = ({ graphData }) => {
       .data(nodeData)
       .enter()
       .append('circle')
-      .attr('r', d => getNodeAttributesLocal(d.weight).radius) 
-      .attr('fill', d => getNodeAttributesLocal(d.weight).color) 
+      .attr('r', d => getNodeAttributes(d.weight).radius) 
+      .attr('fill', d => getNodeAttributes(d.weight).color) 
       .style("cursor", "default") 
       .call(d3.drag()
         .on('start', (event, d) => {
@@ -378,16 +371,23 @@ const GraphVisualization = ({ graphData }) => {
         .attr('y', d => d.y + 3);
     });
 
-    simulation.alpha(1).restart();
+    if (shouldAnimate) {
+      simulation.alpha(1).restart();
+      setShouldAnimate(false);
+    }
     
-  }, [filteredGraphData, graphData, initialNodes, selectedNode, nodeConnections, selectedZone]);
+  }, [filteredGraphData, shouldAnimate]);
 
   const zones = graphData.nodes.filter(
     node =>
       (node.role === 'root' || node.role === 'intermediate') &&
       !node.meanings.includes('Smart Manufacturing')
   );
-    
+
+  useEffect(() => {       // Effettua il rendering del grafo principale quando i dati cambiano
+    renderMainGraph();
+  }, [renderMainGraph]);
+
   const handleZoneClick = (zone) => {
     if (selectedZone?.id === zone.id) {
       setSelectedZone(null);
@@ -403,7 +403,7 @@ const GraphVisualization = ({ graphData }) => {
         node.fy = null;
       });
 
-      setFilteredGraphData((prev) => ({ ...prev })); 
+      //setFilteredGraphData((prev) => ({ ...prev })); 
     }
   };
 
@@ -471,6 +471,12 @@ const GraphVisualization = ({ graphData }) => {
       alert(`The following nodes have invalid weights:\n\n${errorMessage}`);
       return;
     }
+
+    const structure = {
+      nodes: graphData.nodes,
+      transitions: graphData.transitions,
+    };
+    const activation_level = initialNodes;
   
     setIsLoading(true);
     try {
@@ -479,6 +485,7 @@ const GraphVisualization = ({ graphData }) => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ structure, activation_level }),
       });
   
       if (response.ok) {
@@ -655,6 +662,44 @@ const GraphVisualization = ({ graphData }) => {
     });
   }, []);
 
+  const handleExecutePythonWithWeight = async () => {
+    if (!filteredGraphData || !filteredGraphData.nodes) {
+      alert('Graph data is not properly loaded. Please try again.');
+      return;
+    }
+
+    const structure = {
+      nodes: graphData.nodes,
+      transitions: graphData.transitions,
+    };
+    const activation_level = initialNodes;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/execute-python', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ structure, activation_level, global_weight: selectedGlobalWeight }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message);
+        setShowGeneratedGraph(true);
+        setFilteredGraphData(result.graphData);
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.error}`);
+      }
+    } catch (error) {
+      alert('An error occurred while executing the Python script.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (showGeneratedGraph && filteredGraphData) {
       renderGeneratedGraph(filteredGraphData);
@@ -702,6 +747,7 @@ const GraphVisualization = ({ graphData }) => {
                     [selectedZone.id]: !prev[selectedZone.id],
                   }));
                   setSelectedNode(null);
+                  setShouldAnimate(false);
                 }}
                 className="toggle-checkbox"
               />
@@ -734,44 +780,68 @@ const GraphVisualization = ({ graphData }) => {
       )}
 
       {/* Zona per eseguire il codice Python */}
-      <div id="python-execution" className="mt-4 bg-white p-4 rounded shadow-md">
-        <h3 className="text-lg font-bold mb-2">Execute Python Script</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Click the button below to execute the Python script associated with the graph.
-        </p>
-        <button
-          onClick={() => handleExecutePython()}
-          className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <span className="flex items-center">
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                ></path>
-              </svg>
-              Loading...
-            </span>
-          ) : (
-            'Run Python Script'
-          )}
-        </button>
+      <div className="mt-4 bg-gray-50 p-6 rounded-xl shadow flex flex-col md:flex-row gap-8 border border-gray-200">
+        {/* Sinistra: Esecuzione standard */}
+        <div className="flex-1 flex flex-col items-center justify-center md:pr-8 md:border-r border-gray-200">
+          <h3 className="text-xl font-bold mb-2 text-blue-700 text-center">Execute Interference Script</h3>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            Click the button below to execute the Python script associated with the graph.
+          </p>
+          <button
+            onClick={handleExecutePython}
+            className={`w-48 bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-150 text-lg font-semibold ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                Loading...
+              </span>
+            ) : (
+              'Run Inference'
+            )}
+          </button>
+        </div>
+
+        {/* Destra: Esecuzione con peso globale */}
+        <div className="flex-1 flex flex-col items-center justify-center md:pl-8">
+          <h3 className="text-xl font-bold mb-2 text-green-700 text-center">Execute Simulation Script</h3>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            Select a weight for <span className="font-semibold text-green-700">Smart Manufacturing</span> to achieve and execute the Simulation Script.
+          </p>
+          <select
+            value={selectedGlobalWeight}
+            onChange={e => setSelectedGlobalWeight(e.target.value)}
+            className="w-48 p-3 border border-gray-300 rounded-lg mb-6 text-base focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+          >
+            <option value="NA" disabled>Select Weight</option>
+            <option value="VL">Very Low</option>
+            <option value="L">Low</option>
+            <option value="M">Medium</option>
+            <option value="H">High</option>
+            <option value="VH">Very High</option>
+          </select>
+          <button
+            onClick={handleExecutePythonWithWeight}
+            className={`w-48 bg-green-500 text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition-all duration-150 text-lg font-semibold ${isLoading || selectedGlobalWeight === 'NA' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isLoading || selectedGlobalWeight === 'NA'}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                Loading...
+              </span>
+            ) : (
+              'Run Simulation'
+            )}
+          </button>
+        </div>
       </div>
       {showGeneratedGraph && (
         <div id="generated-graph-container" className="mt-4 bg-white p-4 rounded shadow-md">

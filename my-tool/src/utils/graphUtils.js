@@ -45,12 +45,15 @@ export let initialNodes = [
   { id: 42, label: 'DM, BI', weight: 'NA' },
 ];
 
-export const prepareGraphData = (nodes, transitions) => {
-  const nodeData = nodes.map(n => ({
-    id: n.id,
-    role: n.role,
-    meanings: n.meanings,
-  }));
+export const prepareGraphData = (nodes, transitions, weights = []) => {
+  const nodeData = nodes.map(n => {
+    // Cerca il peso aggiornato per questo nodo
+    const found = weights.find(w => w.id === n.id);
+    return {
+      ...n,
+      weight: found ? found.weight : n.weight,
+    };
+  });
 
   const rootEdges = nodes
     .filter(n => n.role === 'intermediate')
@@ -64,7 +67,7 @@ export const prepareGraphData = (nodes, transitions) => {
     .filter(n => n.role === 'intermediate')
     .flatMap(intermediateNode =>
       nodes
-        .filter(finalNode => finalNode.targets.includes(intermediateNode.id))
+        .filter(finalNode => finalNode.targets && finalNode.targets.includes(intermediateNode.id))
         .map(finalNode => ({
           source: intermediateNode.id,
           target: finalNode.id,
