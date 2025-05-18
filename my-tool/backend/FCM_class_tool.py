@@ -18,6 +18,7 @@ class FCM:
     def __init__(self, iterations, structure, activation_level, flt, new_values=[]):
         self.iterations = iterations
         self.al_flt = flt
+        self.flt = flt
         self.lambdas = {}
         self.model : dict[nx.DiGraph] = self.build_model(structure, activation_level, new_values=new_values)
 
@@ -103,25 +104,25 @@ class FCM:
                 # "value" is an array representing the activation level through the iterations
                 if len(new_values) == 0:    # if doing inference
                     # add the intermediate node
-                    G.add_node(node_id, attr_dict = {"value":[0]*iterations})
+                    G.add_node(node_id, attr_dict = {"value":[0]*self.iterations})
                     l_al = all_nodes_al[node_id]['weight']
-                    v_al = flt.get_value(l_al)
+                    v_al = self.flt.get_value(l_al)
                     G.nodes[node_id]['attr_dict']['value'][0] = round(v_al, 5)
                     # add final nodes
                     for other_node_id in destination_of:
-                        G.add_node(other_node_id, attr_dict = {"value":[0]*iterations})
+                        G.add_node(other_node_id, attr_dict = {"value":[0]*self.iterations})
                         l_al = all_nodes_al[other_node_id]['weight']
-                        v_al = flt.get_value(l_al)
+                        v_al = self.flt.get_value(l_al)
                         G.nodes[other_node_id]['attr_dict']['value'][0] = round(v_al, 5)
                 else:   # if doing genetic algorithm
                     # add the intermediate node
-                    G.add_node(node_id, attr_dict = {"value":[0]*iterations})
+                    G.add_node(node_id, attr_dict = {"value":[0]*self.iterations})
                     l_al = all_nodes_al[node_id]['weight']
-                    v_al = flt.get_value(l_al)
+                    v_al = self.flt.get_value(l_al)
                     G.nodes[node_id]['attr_dict']['value'][0] = round(v_al, 5)
                     # add final nodes
                     for other_node_id in destination_of:
-                        G.add_node(other_node_id, attr_dict = {"value":[0]*iterations})
+                        G.add_node(other_node_id, attr_dict = {"value":[0]*self.iterations})
                         l_al = all_nodes_al[other_node_id]['weight']
                         G.nodes[other_node_id]['attr_dict']['value'][0] = round(l_al, 5)
 

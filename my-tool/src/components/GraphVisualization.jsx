@@ -23,6 +23,9 @@ const GraphVisualization = ({ graphData }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showGeneratedGraph, setShowGeneratedGraph] = useState(false);
   const [selectedGlobalWeight, setSelectedGlobalWeight] = useState('NA');
+  const [generatedGraphMode, setGeneratedGraphMode] = useState(null); 
+  const [colorVersion, setColorVersion] = useState(0);
+  const generatedGraphRef = useRef(null);
   
   const nodeConnections = useMemo(() => ({
     1: [6, 7, 8, 9, 10, 11, 12], 
@@ -49,22 +52,39 @@ const GraphVisualization = ({ graphData }) => {
     }
   };
 
-  const getNodeAttributesPy = (weight) => {
+  const getNodeAttributesPy = (weight, version = 0) => {
+    const colorSets = [
+      // Versione 0: rosso
+      { VL: '#f5b7b1', L: '#f1948a', M: '#ec7063', H: '#e74c3c', VH: '#c0392b', DEF: '#000' },
+      // Versione 1: blu
+      { VL: '#aed6f1', L: '#5dade2', M: '#2874a6', H: '#154360', VH: '#1b2631', DEF: '#000' },
+      // Versione 2: verde
+      { VL: '#a3e4d7', L: '#48c9b0', M: '#117864', H: '#145a32', VH: '#0b5345', DEF: '#000' },
+      // Versione 3: viola
+      { VL: '#d2b4de', L: '#af7ac5', M: '#7d3c98', H: '#512e5f', VH: '#4a235a', DEF: '#000' },
+      // Versione 4: arancione
+      { VL: '#fad7a0', L: '#f8c471', M: '#f39c12', H: '#b9770e', VH: '#7e5109', DEF: '#000' },
+    ];
+    const set = colorSets[version] || colorSets[0];
     switch (weight) {
-      case 'VL':
-        return { radius: 7.5, color: '#f5b7b1' }; // Rosso chiaro
-      case 'L':
-        return { radius: 10, color: '#f1948a' }; // Rosso medio
-      case 'M':
-        return { radius: 12.5, color: '#ec7063' }; // Rosso scuro
-      case 'H':
-        return { radius: 15, color: '#e74c3c' }; // Rosso più scuro
-      case 'VH':
-        return { radius: 17.5, color: '#c0392b' }; // Rosso intenso
-      default:
-        return { radius: 5, color: '#000' }; // Nero per "none"
+      case 'VL': return { radius: 7.5, color: set.VL };
+      case 'L':  return { radius: 10, color: set.L };
+      case 'M':  return { radius: 12.5, color: set.M };
+      case 'H':  return { radius: 15, color: set.H };
+      case 'VH': return { radius: 17.5, color: set.VH };
+      default:   return { radius: 5, color: set.DEF };
     }
   };
+
+  const weightLabels = useMemo(() => ({
+    VL: 'Very Low',
+    L: 'Low',
+    M: 'Medium',
+    H: 'High',
+    VH: 'Very High',
+    NA: 'Not Assigned',
+    None: 'Not Assigned'
+  }), []); // Mappa dei pesi
 
   const tableRef = useRef(null); 
   const svgRef = useRef(null);
@@ -494,8 +514,11 @@ const GraphVisualization = ({ graphData }) => {
         alert(result.message);
   
         setShowGeneratedGraph(true);
-  
+        setGeneratedGraphMode('inference');
         setFilteredGraphData(result.graphData);
+        setTimeout(() => {
+          generatedGraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
       } else {
         const error = await response.json();
         console.error('Errore dal backend:', error);
@@ -558,6 +581,7 @@ const GraphVisualization = ({ graphData }) => {
     // Tooltip per mostrare informazioni dettagliate
     const tooltip = d3.select('body')
       .append('div')
+      .attr('class', 'd3-tooltip')
       .style('position', 'absolute')
       .style('background', '#fff')
       .style('border', '1px solid #ccc')
@@ -568,8 +592,8 @@ const GraphVisualization = ({ graphData }) => {
       .style('display', 'none');
   
     const simulation = d3.forceSimulation(graphData.nodes)
-      .force('link', d3.forceLink(validTransitions).id(d => d.id).distance(150))
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('link', d3.forceLink(validTransitions).id(d => d.id).distance(250))
+      .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2));
 
     simulation.on('end', () => {
@@ -607,17 +631,19 @@ const GraphVisualization = ({ graphData }) => {
       .data(graphData.nodes)
       .enter()
       .append('circle')
-      .attr('r', d => getNodeAttributesPy(d.weight).radius)
-      .attr('fill', d => getNodeAttributesPy(d.weight).color)
+      .attr('r', d => getNodeAttributesPy(d.weight, colorVersion).radius)
+      .attr('fill', d => getNodeAttributesPy(d.weight, colorVersion).color)
       .attr('stroke', '#fff')
       .attr('stroke-width', 2)
       .style('cursor', 'pointer')
       .on('mouseover', (event, d) => {
+        const label = weightLabels[d.weight] || d.weight || 'N/A';
+        const acronym = d.weight || 'N/A';
         tooltip
           .style('display', 'block')
           .html(`
             <strong>ID:</strong> ${d.id}<br>
-            <strong>Weight:</strong> ${d.weight || 'N/A'}<br>
+            <strong>Weight:</strong> ${label} (${acronym})<br>
             <strong>Numeric Weight:</strong> ${d.numeric_weight || 'N/A'}
           `);
       })
@@ -660,7 +686,7 @@ const GraphVisualization = ({ graphData }) => {
         .attr('x', d => d.x)
         .attr('y', d => d.y - 10);
     });
-  }, []);
+  }, [colorVersion, weightLabels]);
 
   const handleExecutePythonWithWeight = async () => {
     if (!filteredGraphData || !filteredGraphData.nodes) {
@@ -687,8 +713,13 @@ const GraphVisualization = ({ graphData }) => {
       if (response.ok) {
         const result = await response.json();
         alert(result.message);
+        setColorVersion(1);
         setShowGeneratedGraph(true);
+        setGeneratedGraphMode('simulation');
         setFilteredGraphData(result.graphData);
+        setTimeout(() => {
+          generatedGraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
       } else {
         const error = await response.json();
         alert(`Error: ${error.error}`);
@@ -704,8 +735,13 @@ const GraphVisualization = ({ graphData }) => {
     if (showGeneratedGraph && filteredGraphData) {
       renderGeneratedGraph(filteredGraphData);
     }
-  }, [showGeneratedGraph, filteredGraphData, renderGeneratedGraph]);
+  }, [showGeneratedGraph, filteredGraphData, renderGeneratedGraph, colorVersion]);
 
+  useEffect(() => {
+    if (showGeneratedGraph && filteredGraphData) {
+      renderGeneratedGraph(filteredGraphData);
+    }
+  }, [showGeneratedGraph, filteredGraphData, renderGeneratedGraph, colorVersion]);
 
   return (
     <div className="box-container">
@@ -844,8 +880,35 @@ const GraphVisualization = ({ graphData }) => {
         </div>
       </div>
       {showGeneratedGraph && (
-        <div id="generated-graph-container" className="mt-4 bg-white p-4 rounded shadow-md">
+        <div 
+          id="generated-graph-container" 
+          className="mt-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-200"
+          ref={generatedGraphRef}
+        >
           <h3 className="text-lg font-bold mb-4 text-center">Generated Graph</h3>
+          {generatedGraphMode === 'inference' && (
+            <div className="flex justify-center">
+              <div className="relative">
+              </div>
+            </div>
+          )}
+          {/* Mostra i pulsanti SOLO in modalità simulazione */}
+          {generatedGraphMode === 'simulation' && (
+          <div className="flex justify-center gap-4 mb-4">
+            {[1, 2, 3, 4].map(v => (
+              <button
+                key={v}
+                className={`px-4 py-2 rounded-lg shadow transition-all duration-150 border 
+                  ${colorVersion === v
+                    ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white border-blue-500 scale-105'
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100 hover:text-blue-700'}`}
+                onClick={() => setColorVersion(v)}
+              >
+                <span className="font-semibold">Alternative {v}</span>
+              </button>
+            ))}
+          </div>
+          )}
           <div id="generated-graph" className="w-full h-auto"></div>
         </div>
       )}
