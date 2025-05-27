@@ -3,6 +3,7 @@ from flask_cors import CORS
 from FCM_class_tool import FCM
 import FLT_class
 import json
+import copy
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000'])  
@@ -54,16 +55,6 @@ def execute_simulation():
         flt = FLT_class.define_al_fuzzy()
         iterations = 100 
         threshold = 0.001
-
-        print("FLT:", flt)
-        print("iterations:", iterations)
-        print("threshold:", threshold)
-        print("activation_level:", activation_level)
-
-        #fcm_obj = FCM(iterations, structure, activation_level, flt)
-        #print("FCM object created")
-        #fcm_obj.run_fcm(threshold)
-        #json_output = fcm_obj.generate_al_values()
         
         open_file = open('final_al1.json', 'r')
         json_output1 = open_file.read()
@@ -76,10 +67,10 @@ def execute_simulation():
         json_output2 = json.loads(json_output2)
         open_file.close()
         print("output 2 FCM:", json_output2)
-                
-        single_data1 = structure
+
+        single_data1 = copy.deepcopy(structure)
         final_data1 = {node['id']: node for node in json_output1}
-        single_data2 = structure
+        single_data2 = copy.deepcopy(structure)
         final_data2 = {node['id']: node for node in json_output2}
 
         for node in single_data1['nodes']:
@@ -95,6 +86,10 @@ def execute_simulation():
                 'weight': final_data2[node['id']]['weight'],
                 'numeric_weight': final_data2[node['id']]['numeric_weight']
                 })
+
+        for single_data in [single_data1, single_data2]:
+            if 'transitions' not in single_data:
+                single_data['transitions'] = []
 
         return jsonify({'message': 'Script executed successfully', 'graphData': [single_data1, single_data2]}), 200
         

@@ -8,6 +8,7 @@ const GraphVisualization = ({ graphData }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedZone, setSelectedZone] = useState(null);
   const [initialNodes, setInitialNodes] = useState(initialNodesData);
+  const [generatedGraphData, setGeneratedGraphData] = useState(null);
   const [filteredGraphData, setFilteredGraphData] = useState({
     nodes: graphData.nodes || [],
     transitions: graphData.transitions || [],
@@ -158,9 +159,9 @@ const GraphVisualization = ({ graphData }) => {
     updateFilteredGraphData();
   }, [enabledSections, graphData, nodeConnections, initialNodes]);
 
-  useEffect(() => {
+  /*useEffect(() => { // Log dello stato dei nodi iniziali
     console.log('Stato aggiornato di initialNodes:', initialNodes);
-  }, [initialNodes]);
+  }, [initialNodes]);*/
 
   useEffect(() => {         //SUB-GRAPH
     if (!selectedZone || !enabledSections[selectedZone.id]) return;
@@ -309,12 +310,11 @@ const GraphVisualization = ({ graphData }) => {
       .force("link", d3.forceLink(edgeData).id(d => d.id).distance(250))
       .force("charge", d3.forceManyBody().strength(-1200))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      // Forza radiale: i nodi intermedi si dispongono a raggiera
       .force("radial", d3.forceRadial(
         d => {
-          if (d.role === "root") return 0; // root al centro
-          if (d.role === "intermediate") return 350; // intermedi a una certa distanza
-          return 500; // final più esterni
+          if (d.role === "root") return 0;
+          if (d.role === "intermediate") return 350; 
+          return 500; 
         },
         width / 2,
         height / 2
@@ -398,7 +398,7 @@ const GraphVisualization = ({ graphData }) => {
     
   }, [filteredGraphData, shouldAnimate]);
 
-  const zones = graphData.nodes.filter(
+  const zones = graphData.nodes.filter( // Filtra i nodi per ottenere solo le zone
     node =>
       (node.role === 'root' || node.role === 'intermediate') &&
       !node.meanings.includes('Smart Manufacturing')
@@ -408,7 +408,7 @@ const GraphVisualization = ({ graphData }) => {
     renderMainGraph();
   }, [renderMainGraph]);
 
-  const handleZoneClick = (zone) => {
+  const handleZoneClick = (zone) => {  // Gestisce il click su una zona per mostrare i nodi connessi
     if (selectedZone?.id === zone.id) {
       setSelectedZone(null);
       setSelectedNode(null); 
@@ -427,7 +427,7 @@ const GraphVisualization = ({ graphData }) => {
     }
   };
 
-  const handleUpdateWeight = (nodeId, newWeight) => {
+  const handleUpdateWeight = (nodeId, newWeight) => {   // Aggiorna il peso del nodo selezionato
     if (selectedNode && selectedNode.role === 'final') {
       const nodeIndex = initialNodes.findIndex(node => node.id === nodeId);
       if (nodeIndex !== -1) {        
@@ -463,7 +463,7 @@ const GraphVisualization = ({ graphData }) => {
     }
   };
 
-  const handleExecutePython = async () => {
+  const handleExecutePython = async () => {   // Esegue il codice Python per l'inferenza
     if (!filteredGraphData || !filteredGraphData.nodes) {
       console.error('Filtered graph data is not valid:', filteredGraphData);
       alert('Graph data is not properly loaded. Please try again.');
@@ -496,7 +496,16 @@ const GraphVisualization = ({ graphData }) => {
       nodes: graphData.nodes,
       transitions: graphData.transitions,
     };
-    const activation_level = initialNodes;
+    
+    const outputNodes = initialNodes.map(node => ({ ...node }));
+
+    outputNodes.forEach(node => {
+      if (node.role === 'intermediate') {
+        node.enabled = !!enabledSections[node.id];
+      }
+    });
+
+    const activation_level = outputNodes;
   
     setIsLoading(true);
     try {
@@ -515,7 +524,7 @@ const GraphVisualization = ({ graphData }) => {
   
         setShowGeneratedGraph(true);
         setGeneratedGraphMode('inference');
-        setFilteredGraphData(result.graphData);
+        setGeneratedGraphData(result.graphData);
         setTimeout(() => {
           generatedGraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
@@ -532,28 +541,31 @@ const GraphVisualization = ({ graphData }) => {
     }
   };
   
-  // Funzione per disegnare il nuovo grafo
-  const renderGeneratedGraph = useCallback((graphData) => {
-    if (!graphData || !graphData.nodes || !graphData.transitions) {
+  const renderGeneratedGraph = useCallback((graphData) => {   // Funzione per disegnare il nuovo grafo
+    if (!graphData || !Array.isArray(graphData.nodes) || !Array.isArray(graphData.transitions)) {
       console.error('Invalid graph data:', graphData);
       alert('The graph data is invalid. Please check the backend.');
       return;
     }
   
-    const validTransitions = graphData.transitions.map(link => ({
-      ...link,
-      source: link.from,
-      target: link.to,
-    }));
-  
+    const { nodeData, edgeData } = prepareGraphData(graphData.nodes, graphData.transitions);
+    
+    nodeData.forEach(node => {
+      node.x = undefined;
+      node.y = undefined;
+      node.vx = undefined;
+      node.vy = undefined;
+      node.fx = undefined;
+      node.fy = undefined;
+    });
+
     const container = d3.select('#generated-graph');
-  
+    container.selectAll('*').remove();
+    
     if (container.empty()) {
       console.error('Generated graph container not found');
       return;
     }
-  
-    container.selectAll('*').remove();
   
     const width = container.node().clientWidth;
     const height = 500;
@@ -591,14 +603,20 @@ const GraphVisualization = ({ graphData }) => {
       .style('pointer-events', 'none')
       .style('display', 'none');
   
-    const simulation = d3.forceSimulation(graphData.nodes)
-      .force('link', d3.forceLink(validTransitions).id(d => d.id).distance(400).strength(0.3))
-      .force('charge', d3.forceManyBody().strength(-350))
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide()
-        .radius(d => getNodeAttributesPy(d.weight, colorVersion).radius + 30)
-        .iterations(4)
-      );
+    const simulation = d3.forceSimulation(nodeData)
+      .force("link", d3.forceLink(edgeData).id(d => d.id).distance(250))
+      .force("charge", d3.forceManyBody().strength(-1200))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("radial", d3.forceRadial(
+        d => {
+          if (d.role === "root") return 0;
+          if (d.role === "intermediate") return 350;
+          return 500;
+        },
+        width / 2,
+        height / 2
+      ).strength(0.9))
+      .force("collision", d3.forceCollide().radius(d => getNodeAttributes(d.weight).radius + 5).iterations(5));
 
     simulation.on('end', () => {
       graphData.nodes.forEach(d => {
@@ -611,7 +629,7 @@ const GraphVisualization = ({ graphData }) => {
     const link = graphGroup.append('g')
       .attr('class', 'links')
       .selectAll('line')
-      .data(validTransitions)
+      .data(edgeData)
       .enter()
       .append('line')
       .attr('stroke-width', d => d.weight * 2 || 1)
@@ -620,7 +638,7 @@ const GraphVisualization = ({ graphData }) => {
     const labels = graphGroup.append('g')
       .attr('class', 'labels')
       .selectAll('text')
-      .data(graphData.nodes)
+      .data(nodeData)
       .enter()
       .append('text')
       .attr('font-size', '24px')
@@ -632,7 +650,7 @@ const GraphVisualization = ({ graphData }) => {
     const node = graphGroup.append('g')
       .attr('class', 'nodes')
       .selectAll('circle')
-      .data(graphData.nodes)
+      .data(nodeData)
       .enter()
       .append('circle')
       .attr('r', d => getNodeAttributesPy(d.weight, colorVersion).radius)
@@ -724,15 +742,15 @@ const GraphVisualization = ({ graphData }) => {
       transitions: graphData.transitions,
     };
     
-    const syncedInitialNodes = initialNodes.map(node =>
-      node.role === 'intermediate'
-        ? { ...node, enabled: !!enabledSections[node.id] }
-        : node
-    );
+    const outputNodes = initialNodes.map(node => ({ ...node }));
 
-    console.log('activation_level inviato:', syncedInitialNodes);
+    outputNodes.forEach(node => {
+      if (node.role === 'intermediate') {
+        node.enabled = !!enabledSections[node.id];
+      }
+    });
 
-    const activation_level = syncedInitialNodes;
+    const activation_level = outputNodes;
 
     setIsLoading(true);
     try {
@@ -748,14 +766,14 @@ const GraphVisualization = ({ graphData }) => {
         const result = await response.json();
         
         // results contains a list of 2 graphs
-        const [graphData1, graphData2] = result.graphData;
+        //const [graphData1, graphData2] = result.graphData;
 
         alert(result.message);
         setColorVersion(1);
         setShowGeneratedGraph(true);
         setGeneratedGraphMode('simulation');
 
-        setFilteredGraphData(graphData1);
+        setGeneratedGraphData(result.graphData);
         
         setTimeout(() => {
           generatedGraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -771,7 +789,29 @@ const GraphVisualization = ({ graphData }) => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => {   // Effettua il rendering del grafo generato quando i dati cambiano
+    if (!showGeneratedGraph || !generatedGraphData) return;
+
+    if (generatedGraphMode === 'simulation') {
+      const graphIndex = colorVersion - 1;
+      if (
+        Array.isArray(generatedGraphData) &&
+        generatedGraphData[graphIndex] &&
+        Array.isArray(generatedGraphData[graphIndex].nodes) &&
+        Array.isArray(generatedGraphData[graphIndex].transitions)
+      ) {
+        renderGeneratedGraph(generatedGraphData[graphIndex]);
+      }
+    } else if (
+      generatedGraphData &&
+      Array.isArray(generatedGraphData.nodes) &&
+      Array.isArray(generatedGraphData.transitions)
+    ) {
+      renderGeneratedGraph(generatedGraphData);
+    }
+  }, [showGeneratedGraph, generatedGraphData, renderGeneratedGraph, colorVersion, generatedGraphMode]);
+
+  useEffect(() => {   // Aggiorna lo stato dei nodi iniziali in base alle sezioni abilitate
     setInitialNodes(prev =>
       prev.map(node =>
         node.role === 'intermediate'
@@ -780,13 +820,6 @@ const GraphVisualization = ({ graphData }) => {
       )
     );
   }, [enabledSections]);
-
-  useEffect(() => {
-    if (showGeneratedGraph && filteredGraphData) {
-      renderGeneratedGraph(filteredGraphData);
-    }
-  }, [showGeneratedGraph, filteredGraphData, renderGeneratedGraph, colorVersion]);
-
 
   return (
     <div className="box-container">
