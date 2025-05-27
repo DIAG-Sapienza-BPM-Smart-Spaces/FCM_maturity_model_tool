@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "label": "CAD, CAM, PLM",
+        "weight": "VH",
+        "numeric_weight": 0.80205
+    },
+    {
+        "id": 6,
+        "label": "IIoT",
+        "weight": "M",
+        "numeric_weight": 0.51355
+    },
+    {
+        "id": 7,
+        "label": "Cloud Services",
+        "weight": "H",
+        "numeric_weight": 0.60813
+    },
+    {
+        "id": 8,
+        "label": "AI, CV, PM, RPA",
+        "weight": "H",
+        "numeric_weight": 0.62732
+    },
+    {
+        "id": 9,
+        "label": "Cyber Security",
+        "weight": "H",
+        "numeric_weight": 0.62555
+    },
+    {
+        "id": 10,
+        "label": "AR, VR",
+        "weight": "M",
+        "numeric_weight": 0.55229
+    },
+    {
+        "id": 11,
+        "label": "Digital Twin",
+        "weight": "H",
+        "numeric_weight": 0.66084
+    },
+    {
+        "id": 12,
+        "label": "DM, BI",
+        "weight": "H",
+        "numeric_weight": 0.63583
+    },
+    {
+        "id": 0,
+        "label": "Smart Manufacturing",
+        "weight": "VH",
+        "numeric_weight": 0.80205
+    }
+]

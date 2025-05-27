@@ -500,7 +500,7 @@ const GraphVisualization = ({ graphData }) => {
   
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/execute-python', {
+      const response = await fetch('http://localhost:5000/inference', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -592,9 +592,13 @@ const GraphVisualization = ({ graphData }) => {
       .style('display', 'none');
   
     const simulation = d3.forceSimulation(graphData.nodes)
-      .force('link', d3.forceLink(validTransitions).id(d => d.id).distance(250))
-      .force('charge', d3.forceManyBody().strength(-100))
-      .force('center', d3.forceCenter(width / 2, height / 2));
+      .force('link', d3.forceLink(validTransitions).id(d => d.id).distance(400).strength(0.3))
+      .force('charge', d3.forceManyBody().strength(-350))
+      .force('center', d3.forceCenter(width / 2, height / 2))
+      .force('collision', d3.forceCollide()
+        .radius(d => getNodeAttributesPy(d.weight, colorVersion).radius + 30)
+        .iterations(4)
+      );
 
     simulation.on('end', () => {
       graphData.nodes.forEach(d => {
@@ -688,9 +692,30 @@ const GraphVisualization = ({ graphData }) => {
     });
   }, [colorVersion, weightLabels]);
 
-  const handleExecutePythonWithWeight = async () => {
+  const handleExecutePythonSimulation = async () => {
     if (!filteredGraphData || !filteredGraphData.nodes) {
       alert('Graph data is not properly loaded. Please try again.');
+      return;
+    }
+
+    const enabledZoneIds = Object.keys(enabledSections).filter(zoneId => enabledSections[zoneId]);
+    const visibleNodeIds = enabledZoneIds.flatMap(zoneId => nodeConnections[zoneId] || []);
+    const invalidNodes = filteredGraphData.nodes.filter(
+      node => visibleNodeIds.includes(node.id) && (!node.weight || node.weight === 'None' || node.weight === 'NA')
+    );
+
+    if (invalidNodes.length > 0) {
+      const errorMessage = invalidNodes.map(node => {
+        const intermediateNode = graphData.nodes.find(intermediate =>
+          intermediate.role === 'intermediate' &&
+          nodeConnections[intermediate.id]?.includes(node.id)
+        );
+        const sectionName = intermediateNode?.meanings?.join(', ') || 'Unknown Section';
+        const nodeMeanings = node.meanings?.join(', ') || 'No Meanings';
+        return `Node ID: ${node.id}, Node Name: ${nodeMeanings}, Section: ${sectionName}`;
+      }).join('\n');
+
+      alert(`The following nodes have invalid weights:\n\n${errorMessage}`);
       return;
     }
 
@@ -698,11 +723,20 @@ const GraphVisualization = ({ graphData }) => {
       nodes: graphData.nodes,
       transitions: graphData.transitions,
     };
-    const activation_level = initialNodes;
+    
+    const syncedInitialNodes = initialNodes.map(node =>
+      node.role === 'intermediate'
+        ? { ...node, enabled: !!enabledSections[node.id] }
+        : node
+    );
+
+    console.log('activation_level inviato:', syncedInitialNodes);
+
+    const activation_level = syncedInitialNodes;
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/execute-python', {
+      const response = await fetch('http://localhost:5000/simulation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -712,11 +746,17 @@ const GraphVisualization = ({ graphData }) => {
 
       if (response.ok) {
         const result = await response.json();
+        
+        // results contains a list of 2 graphs
+        const [graphData1, graphData2] = result.graphData;
+
         alert(result.message);
         setColorVersion(1);
         setShowGeneratedGraph(true);
         setGeneratedGraphMode('simulation');
-        setFilteredGraphData(result.graphData);
+
+        setFilteredGraphData(graphData1);
+        
         setTimeout(() => {
           generatedGraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
@@ -732,16 +772,21 @@ const GraphVisualization = ({ graphData }) => {
   };
 
   useEffect(() => {
-    if (showGeneratedGraph && filteredGraphData) {
-      renderGeneratedGraph(filteredGraphData);
-    }
-  }, [showGeneratedGraph, filteredGraphData, renderGeneratedGraph, colorVersion]);
+    setInitialNodes(prev =>
+      prev.map(node =>
+        node.role === 'intermediate'
+          ? { ...node, enabled: !!enabledSections[node.id] }
+          : node
+      )
+    );
+  }, [enabledSections]);
 
   useEffect(() => {
     if (showGeneratedGraph && filteredGraphData) {
       renderGeneratedGraph(filteredGraphData);
     }
   }, [showGeneratedGraph, filteredGraphData, renderGeneratedGraph, colorVersion]);
+
 
   return (
     <div className="box-container">
@@ -778,12 +823,33 @@ const GraphVisualization = ({ graphData }) => {
                 type="checkbox"
                 checked={enabledSections[selectedZone.id]}
                 onChange={() => {
+                  const newEnabled = !enabledSections[selectedZone.id];
+                  
+                  const enabledCount = Object.entries(enabledSections)
+                    .filter(([id, enabled]) => {
+                      const node = initialNodes.find(n => n.id === Number(id));
+                      return node?.role === 'intermediate' && enabled;
+                    }).length;
+
+                  if (!newEnabled && enabledCount === 1) {
+                    alert('At least one section must remain enabled.');
+                    return;
+                  }
+                  
                   setEnabledSections(prev => ({
                     ...prev,
-                    [selectedZone.id]: !prev[selectedZone.id],
+                    [selectedZone.id]: newEnabled,
                   }));
                   setSelectedNode(null);
                   setShouldAnimate(false);
+
+                  setInitialNodes(prev =>
+                    prev.map(node =>
+                      node.id === selectedZone.id && node.role === 'intermediate'
+                        ? { ...node, enabled: newEnabled }
+                        : node
+                    )
+                  );
                 }}
                 className="toggle-checkbox"
               />
@@ -861,7 +927,7 @@ const GraphVisualization = ({ graphData }) => {
             <option value="VH">Very High</option>
           </select>
           <button
-            onClick={handleExecutePythonWithWeight}
+            onClick={handleExecutePythonSimulation}
             className={`w-48 bg-green-500 text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition-all duration-150 text-lg font-semibold ${isLoading || selectedGlobalWeight === 'NA' ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={isLoading || selectedGlobalWeight === 'NA'}
           >
@@ -895,7 +961,7 @@ const GraphVisualization = ({ graphData }) => {
           {/* Mostra i pulsanti SOLO in modalità simulazione */}
           {generatedGraphMode === 'simulation' && (
           <div className="flex justify-center gap-4 mb-4">
-            {[1, 2, 3, 4].map(v => (
+            {[1, 2].map(v => (
               <button
                 key={v}
                 className={`px-4 py-2 rounded-lg shadow transition-all duration-150 border 
