@@ -779,16 +779,29 @@ const GraphVisualization = ({ graphData }) => {
 
       if (response.ok) {
         const result = await response.json();
-        
-        // results contains a list of 2 graphs
-        //const [graphData1, graphData2] = result.graphData;
-
         alert(result.message);
+
+        const enabledIntermediateIds = outputNodes
+          .filter(n => n.role === 'intermediate' && n.enabled)
+          .map(n => n.id);
+
+        const visibleNodeIds = [
+          ...graphData.nodes.filter(n => n.role === 'root').map(n => n.id),
+          ...enabledIntermediateIds,
+          ...enabledIntermediateIds.flatMap(id => nodeConnections[id] || [])
+        ];
+
+        const filteredGraphData = result.graphData.map(graph => ({
+          nodes: graph.nodes.filter(n => visibleNodeIds.includes(n.id)),
+          transitions: graph.transitions.filter(
+            t => visibleNodeIds.includes(t.from) && visibleNodeIds.includes(t.to)
+          ),
+        }));
+
         setColorVersion(1);
         setShowGeneratedGraph(true);
         setGeneratedGraphMode('simulation');
-
-        setGeneratedGraphData(result.graphData);
+        setGeneratedGraphData(filteredGraphData);
         
         setTimeout(() => {
           generatedGraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
