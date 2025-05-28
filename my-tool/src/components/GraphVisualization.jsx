@@ -159,10 +159,6 @@ const GraphVisualization = ({ graphData }) => {
     updateFilteredGraphData();
   }, [enabledSections, graphData, nodeConnections, initialNodes]);
 
-  /*useEffect(() => { // Log dello stato dei nodi iniziali
-    console.log('Stato aggiornato di initialNodes:', initialNodes);
-  }, [initialNodes]);*/
-
   useEffect(() => {         //SUB-GRAPH
     if (!selectedZone || !enabledSections[selectedZone.id]) return;
   
@@ -522,9 +518,28 @@ const GraphVisualization = ({ graphData }) => {
         console.log('Dati restituiti dal backend:', result.graphData); 
         alert(result.message);
   
+        const enabledIntermediateIds = outputNodes
+          .filter(n => n.role === 'intermediate' && n.enabled)
+          .map(n => n.id);
+
+        const visibleNodeIds = [
+          ...graphData.nodes.filter(n => n.role === 'root').map(n => n.id),
+          ...enabledIntermediateIds,
+          ...enabledIntermediateIds.flatMap(id => nodeConnections[id] || [])
+        ];
+
+        const filteredNodes = result.graphData.nodes.filter(n => visibleNodeIds.includes(n.id));
+        const filteredTransitions = result.graphData.transitions.filter(
+          t => visibleNodeIds.includes(t.from) && visibleNodeIds.includes(t.to)
+        );
+
         setShowGeneratedGraph(true);
         setGeneratedGraphMode('inference');
-        setGeneratedGraphData(result.graphData);
+        setGeneratedGraphData({
+          nodes: filteredNodes,
+          transitions: filteredTransitions,
+        });
+
         setTimeout(() => {
           generatedGraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);

@@ -19,16 +19,11 @@ def execute_python():
         iterations = 100 
         threshold = 0.001
 
-        #print("FLT:", flt)
-        #print("iterations:", iterations)
-        #print("threshold:", threshold)
-        print("activation_level:", activation_level)
-
         fcm_obj = FCM(iterations, structure, activation_level, flt)
         print("FCM object created")
         fcm_obj.run_fcm(threshold)
         json_output = fcm_obj.generate_al_values()
-        print("output FCM:", json_output)
+        #print("output FCM:", json_output)
                 
         single_data = structure
         final_data = {node['id']: node for node in json_output}
@@ -52,21 +47,21 @@ def execute_simulation():
         structure = data.get('structure')
         activation_level = data.get('activation_level')
 
-        flt = FLT_class.define_al_fuzzy()
-        iterations = 100 
-        threshold = 0.001
+        #flt = FLT_class.define_al_fuzzy()
+        #iterations = 100 
+        #threshold = 0.001
         
         open_file = open('final_al1.json', 'r')
         json_output1 = open_file.read()
         json_output1 = json.loads(json_output1)
         open_file.close()
-        print("output 1 FCM:", json_output1)
+        #print("output 1 FCM:", json_output1)
 
         open_file = open('final_al2.json', 'r')
         json_output2 = open_file.read()
         json_output2 = json.loads(json_output2)
         open_file.close()
-        print("output 2 FCM:", json_output2)
+        #print("output 2 FCM:", json_output2)
 
         single_data1 = copy.deepcopy(structure)
         final_data1 = {node['id']: node for node in json_output1}
