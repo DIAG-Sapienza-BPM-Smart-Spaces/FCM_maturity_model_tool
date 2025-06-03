@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import * as d3 from 'd3';
-import { prepareGraphData, initialNodes as initialNodesData} from '../utils/graphUtils';
+import { prepareGraphData} from '../utils/graphUtils';
 import ElementsList from './ElementsList';
 
 const GraphVisualization = ({ graphData }) => {
   const [shouldAnimate, setShouldAnimate] = useState(true);
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedZone, setSelectedZone] = useState(null);
-  const [initialNodes, setInitialNodes] = useState(initialNodesData);
   const [generatedGraphData, setGeneratedGraphData] = useState(null);
   const [filteredGraphData, setFilteredGraphData] = useState({
     nodes: graphData.nodes || [],
@@ -28,13 +27,43 @@ const GraphVisualization = ({ graphData }) => {
   const [colorVersion, setColorVersion] = useState(0);
   const generatedGraphRef = useRef(null);
   
-  const nodeConnections = useMemo(() => ({
-    1: [6, 7, 8, 9, 10, 11, 12], 
-    2: [13, 14, 15, 16, 17, 18],
-    3: [19, 20, 21, 22, 23, 24, 25, 26],
-    4: [27, 28, 29, 30, 31, 32, 33, 34],
-    5: [35, 36, 37, 38, 39, 40, 41, 42],
-  }), []);
+  const [initialNodes, setInitialNodes] = useState(() =>
+  graphData.nodes.map(node => ({
+    id: node.id,
+    role: node.role,
+    label: node.label || (node.meanings ? node.meanings.join(', ') : ''),
+    weight: node.weight || 'NA',
+    enabled: node.role === 'intermediate' ? true : undefined,
+    meanings: node.meanings || [],
+  }))
+);
+
+useEffect(() => {
+  setInitialNodes(
+    graphData.nodes.map(node => ({
+      id: node.id,
+      role: node.role,
+      label: node.label || (node.meanings ? node.meanings.join(', ') : ''),
+      weight: node.weight || 'NA',
+      enabled: node.role === 'intermediate' ? true : undefined,
+      meanings: node.meanings || [],
+    }))
+  );
+}, [graphData]);
+
+const nodeConnections = useMemo(() => {
+  // Esempio: ogni intermediate ha una lista di leaf collegati
+  const connections = {};
+  graphData.nodes.forEach(node => {
+    if (node.role === 'intermediate') {
+      const connected = graphData.nodes
+        .filter(n => n.targets && n.targets.includes(node.id))
+        .map(n => n.id);
+      connections[node.id] = connected;
+    }
+  });
+  return connections;
+}, [graphData]);
 
   const getNodeAttributes = (weight) => {
     switch (weight) {

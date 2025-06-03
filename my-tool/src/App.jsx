@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Graph from './components/GraphVisualization';
-import single_file from '../src/single_file.json'; // Importa il file JSON di esempio
 
 function App() {
   // Stato iniziale per il grafo
   const [graphData, setGraphData] = useState({
-    nodes: single_file.nodes || [],
-    transitions: single_file.transitions || [],
+    nodes: [],
+    transitions: [],
   });
 
   useEffect(() => {
