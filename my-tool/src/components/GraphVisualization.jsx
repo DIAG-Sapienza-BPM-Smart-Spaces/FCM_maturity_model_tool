@@ -53,27 +53,20 @@ const GraphVisualization = ({ graphData }) => {
     }
   };
 
-  const getNodeAttributesPy = (weight, version = 0) => {
-    const colorSets = [
-      // Versione 0: rosso
-      { VL: '#f5b7b1', L: '#f1948a', M: '#ec7063', H: '#e74c3c', VH: '#c0392b', DEF: '#000' },
-      // Versione 1: blu
-      { VL: '#aed6f1', L: '#5dade2', M: '#2874a6', H: '#154360', VH: '#1b2631', DEF: '#000' },
-      // Versione 2: verde
-      { VL: '#a3e4d7', L: '#48c9b0', M: '#117864', H: '#145a32', VH: '#0b5345', DEF: '#000' },
-      // Versione 3: viola
-      { VL: '#d2b4de', L: '#af7ac5', M: '#7d3c98', H: '#512e5f', VH: '#4a235a', DEF: '#000' },
-      // Versione 4: arancione
-      { VL: '#fad7a0', L: '#f8c471', M: '#f39c12', H: '#b9770e', VH: '#7e5109', DEF: '#000' },
-    ];
-    const set = colorSets[version] || colorSets[0];
+  const getRedNodeAttributes = (weight) => {
     switch (weight) {
-      case 'VL': return { radius: 7.5, color: set.VL };
-      case 'L':  return { radius: 10, color: set.L };
-      case 'M':  return { radius: 12.5, color: set.M };
-      case 'H':  return { radius: 15, color: set.H };
-      case 'VH': return { radius: 17.5, color: set.VH };
-      default:   return { radius: 5, color: set.DEF };
+      case 'VL':
+        return { radius: 7.5, color: '#ffb3b3' }; // Rosso molto chiaro
+      case 'L':
+        return { radius: 10, color: '#ff6666' }; // Rosso chiaro
+      case 'M':
+        return { radius: 12.5, color: '#ff3333' }; // Rosso medio
+      case 'H':
+        return { radius: 15, color: '#e74c3c' }; // Rosso standard
+      case 'VH':
+        return { radius: 17.5, color: '#b71c1c' }; // Rosso intenso
+      default:
+        return { radius: 5, color: '#e74c3c' }; // Default rosso
     }
   };
 
@@ -555,16 +548,21 @@ const GraphVisualization = ({ graphData }) => {
       setIsLoading(false);
     }
   };
+
+  const initialNodeMap = useMemo(
+    () => Object.fromEntries(initialNodes.map(n => [n.id, n.weight])),
+    [initialNodes]
+  );
   
-  const renderGeneratedGraph = useCallback((graphData) => {   // Funzione per disegnare il nuovo grafo
+  const renderGeneratedGraph = useCallback((graphData) => {
     if (!graphData || !Array.isArray(graphData.nodes) || !Array.isArray(graphData.transitions)) {
       console.error('Invalid graph data:', graphData);
       alert('The graph data is invalid. Please check the backend.');
       return;
     }
-  
+
     const { nodeData, edgeData } = prepareGraphData(graphData.nodes, graphData.transitions);
-    
+
     nodeData.forEach(node => {
       node.x = undefined;
       node.y = undefined;
@@ -576,15 +574,15 @@ const GraphVisualization = ({ graphData }) => {
 
     const container = d3.select('#generated-graph');
     container.selectAll('*').remove();
-    
+
     if (container.empty()) {
       console.error('Generated graph container not found');
       return;
     }
-  
+
     const width = container.node().clientWidth;
     const height = 500;
-  
+
     const svg = container
       .append('svg')
       .attr('width', '100%')
@@ -594,17 +592,17 @@ const GraphVisualization = ({ graphData }) => {
       .style('background-color', '#f9f9f9')
       .style('border', '1px solid #ccc')
       .style('border-radius', '8px');
-  
+
     const graphGroup = svg.append('g');
-  
+
     const zoom = d3.zoom()
       .scaleExtent([0.5, 2])
       .on('zoom', (event) => {
         graphGroup.attr('transform', event.transform);
       });
-  
+
     svg.call(zoom);
-  
+
     // Tooltip per mostrare informazioni dettagliate
     const tooltip = d3.select('body')
       .append('div')
@@ -617,7 +615,7 @@ const GraphVisualization = ({ graphData }) => {
       .style('box-shadow', '0px 4px 6px rgba(0, 0, 0, 0.1)')
       .style('pointer-events', 'none')
       .style('display', 'none');
-  
+
     const simulation = d3.forceSimulation(nodeData)
       .force("link", d3.forceLink(edgeData).id(d => d.id).distance(250))
       .force("charge", d3.forceManyBody().strength(-1200))
@@ -635,7 +633,7 @@ const GraphVisualization = ({ graphData }) => {
 
     simulation.on('end', () => {
       graphData.nodes.forEach(d => {
-        d.fx = d.x; 
+        d.fx = d.x;
         d.fy = d.y;
       });
       simulation.stop();
@@ -649,7 +647,7 @@ const GraphVisualization = ({ graphData }) => {
       .append('line')
       .attr('stroke-width', d => d.weight * 2 || 1)
       .attr('stroke', '#aaa');
-      
+
     const labels = graphGroup.append('g')
       .attr('class', 'labels')
       .selectAll('text')
@@ -662,27 +660,95 @@ const GraphVisualization = ({ graphData }) => {
       .attr('dy', -15)
       .text(d => d.label || d.meanings.join(', '));
 
-    const node = graphGroup.append('g')
+    const nodeGroup = graphGroup.append('g')
       .attr('class', 'nodes')
-      .selectAll('circle')
+      .selectAll('g')
       .data(nodeData)
       .enter()
-      .append('circle')
-      .attr('r', d => getNodeAttributesPy(d.weight, colorVersion).radius)
-      .attr('fill', d => getNodeAttributesPy(d.weight, colorVersion).color)
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 2)
+      .append('g');
+
+    const weightOrder = { VL: 0, L: 1, M: 2, H: 3, VH: 4 };
+
+    function compareWeights(initial, current) {
+      if (!(initial in weightOrder) || !(current in weightOrder)) return 0;
+      if (weightOrder[current] > weightOrder[initial]) return 1; // aumentato
+      if (weightOrder[current] < weightOrder[initial]) return -1; // diminuito
+      return 0; // uguale
+    }
+
+    // 1. Cerchio base per tutti i nodi (sempre visibile)
+        
+    nodeGroup.each(function(d) {
+      const initial = initialNodeMap[d.id];
+      const current = d.weight;
+      const isRootOrIntermediate = d.role === 'root' || d.role === 'intermediate';
+      const cmp = initial ? compareWeights(initial, current) : 0;
+
+      // Peso aumentato: rosso dietro, verde sopra
+      if (cmp === 1) {
+        // Cerchio rosso dietro (peso attuale)
+        d3.select(this).append('circle')
+          .attr('r', getRedNodeAttributes(current).radius)
+          .attr('fill', getRedNodeAttributes(current).color)
+          .attr('stroke', getRedNodeAttributes(current).color)
+          .attr('stroke-width', 2)
+          .attr('opacity', 1);
+
+        // Cerchio verde sopra (peso iniziale)
+        d3.select(this).append('circle')
+          .attr('r', getNodeAttributes(initial).radius)
+          .attr('fill', isRootOrIntermediate ? getRedNodeAttributes(initial).color : getNodeAttributes(initial).color)
+          .attr('stroke', isRootOrIntermediate ? getRedNodeAttributes(initial).color : getNodeAttributes(initial).color)
+          .attr('stroke-width', 2)
+          .attr('opacity', 1);
+      }
+      // Peso diminuito: verde dietro, rosso sopra
+      else if (cmp === -1) {
+        // Cerchio verde dietro (peso iniziale)
+        d3.select(this).append('circle')
+          .attr('r', getNodeAttributes(initial).radius)
+          .attr('fill', isRootOrIntermediate ? getRedNodeAttributes(initial).color : getNodeAttributes(initial).color)
+          .attr('stroke', isRootOrIntermediate ? getRedNodeAttributes(initial).color : getNodeAttributes(initial).color)
+          .attr('stroke-width', 2)
+          .attr('opacity', 1);
+
+        // Cerchio rosso sopra (peso attuale)
+        d3.select(this).append('circle')
+          .attr('r', getNodeAttributes(current).radius)
+          .attr('fill', getRedNodeAttributes(current).color)
+          .attr('stroke', getRedNodeAttributes(current).color)
+          .attr('stroke-width', 2)
+          .attr('opacity', 1);
+      }
+      // Peso invariato: solo verde
+      else {
+        d3.select(this).append('circle')
+          .attr('r', getNodeAttributes(current).radius)
+          .attr('fill', isRootOrIntermediate ? getRedNodeAttributes(current).color : getNodeAttributes(current).color)
+          .attr('stroke', isRootOrIntermediate ? getRedNodeAttributes(current).color : '#27ae60')
+          .attr('stroke-width', 2)
+          .attr('opacity', 1);
+      }
+    });
+
+    nodeGroup.selectAll('circle')
       .style('cursor', 'pointer')
       .on('mouseover', (event, d) => {
-        const label = weightLabels[d.weight] || d.weight || 'N/A';
-        const acronym = d.weight || 'N/A';
+        const initialWeight = initialNodeMap[d.id];
+        const currentWeight = d.weight;
+        const initialLabel = weightLabels[initialWeight] || initialWeight;
+        const currentLabel = weightLabels[currentWeight] || currentWeight || 'N/A';
+        let html = `<strong>ID:</strong> ${d.id}<br>`;
+        if (initialWeight && initialWeight !== currentWeight) {
+          html += `<strong>Initial Weight:</strong> ${initialLabel}<br>`;
+          html += `<strong>Current Weight:</strong> ${currentLabel}<br>`;
+        } else {
+          html += `<strong>Weight:</strong> ${currentLabel}<br>`;
+        }
+        html += `<strong>Numeric Weight:</strong> ${d.numeric_weight || 'N/A'}`;
         tooltip
           .style('display', 'block')
-          .html(`
-            <strong>ID:</strong> ${d.id}<br>
-            <strong>Weight:</strong> ${label} (${acronym})<br>
-            <strong>Numeric Weight:</strong> ${d.numeric_weight || 'N/A'}
-          `);
+          .html(html);
       })
       .on('mousemove', (event) => {
         tooltip
@@ -707,23 +773,29 @@ const GraphVisualization = ({ graphData }) => {
           d.fx = d.x;
           d.fy = d.y;
         }));
-  
+
+    // Nel tick aggiorna tutti i cerchi
+    nodeGroup.selectAll('circle')
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y);
+
     simulation.on('tick', () => {
       link
         .attr('x1', d => d.source.x)
         .attr('y1', d => d.source.y)
         .attr('x2', d => d.target.x)
         .attr('y2', d => d.target.y);
-  
-      node
+
+      nodeGroup.selectAll('circle')
         .attr('cx', d => d.x)
         .attr('cy', d => d.y);
-  
+
       labels
         .attr('x', d => d.x)
         .attr('y', d => d.y - 10);
     });
-  }, [colorVersion, weightLabels]);
+
+  }, [weightLabels, initialNodeMap]);
 
   const handleExecutePythonSimulation = async () => {
     if (!filteredGraphData || !filteredGraphData.nodes) {
