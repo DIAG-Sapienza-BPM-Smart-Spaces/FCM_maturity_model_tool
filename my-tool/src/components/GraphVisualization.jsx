@@ -8,11 +8,11 @@ const GraphVisualization = ({ graphData }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedZone, setSelectedZone] = useState(null);
   const [generatedGraphData, setGeneratedGraphData] = useState(null);
-  const [filteredGraphData, setFilteredGraphData] = useState({
+  const [filteredGraphData, setFilteredGraphData] = useState({ // Stato per i dati del grafo filtrato
     nodes: graphData.nodes || [],
     transitions: graphData.transitions || [],
   });
-  const [enabledSections, setEnabledSections] = useState(
+  const [enabledSections, setEnabledSections] = useState(   // Stato per le sezioni abilitate
     graphData.nodes.reduce((acc, node) => {
       if (node.role === 'root' || node.role === 'intermediate') {
         acc[node.id] = true; 
@@ -27,7 +27,7 @@ const GraphVisualization = ({ graphData }) => {
   const [colorVersion, setColorVersion] = useState(0);
   const generatedGraphRef = useRef(null);
   
-  const [initialNodes, setInitialNodes] = useState(() =>
+  const [initialNodes, setInitialNodes] = useState(() =>  // Inizializza i nodi iniziali con i dati del grafo
   graphData.nodes.map(node => ({
     id: node.id,
     role: node.role,
@@ -38,7 +38,7 @@ const GraphVisualization = ({ graphData }) => {
   }))
 );
 
-useEffect(() => {
+useEffect(() => { // Inizializza i nodi iniziali quando il grafo cambia
   setInitialNodes(
     graphData.nodes.map(node => ({
       id: node.id,
@@ -51,8 +51,7 @@ useEffect(() => {
   );
 }, [graphData]);
 
-const nodeConnections = useMemo(() => {
-  // Esempio: ogni intermediate ha una lista di leaf collegati
+const nodeConnections = useMemo(() => { // Crea un oggetto che mappa gli ID dei nodi intermedi ai nodi connessi
   const connections = {};
   graphData.nodes.forEach(node => {
     if (node.role === 'intermediate') {
@@ -65,7 +64,7 @@ const nodeConnections = useMemo(() => {
   return connections;
 }, [graphData]);
 
-  const getNodeAttributes = (weight) => {
+  const getNodeAttributes = (weight) => { // Funzione per ottenere gli attributi dei nodi in base al peso
     switch (weight) {
       case 'VL':
         return { radius: 7.5, color: '#a3c1ad' }; // Verde chiaro
@@ -82,7 +81,7 @@ const nodeConnections = useMemo(() => {
     }
   };
 
-  const getRedNodeAttributes = (weight) => {
+  const getRedNodeAttributes = (weight) => { // Funzione per ottenere gli attributi dei nodi rossi
     switch (weight) {
       case 'VL':
         return { radius: 7.5, color: '#ffb3b3' }; // Rosso molto chiaro
@@ -99,7 +98,7 @@ const nodeConnections = useMemo(() => {
     }
   };
 
-  const weightLabels = useMemo(() => ({
+  const weightLabels = useMemo(() => ({ // Mappa dei pesi per visualizzazione
     VL: 'Very Low',
     L: 'Low',
     M: 'Medium',
@@ -578,12 +577,12 @@ const nodeConnections = useMemo(() => {
     }
   };
 
-  const initialNodeMap = useMemo(
+  const initialNodeMap = useMemo( // Crea una mappa dei nodi iniziali per un accesso rapido
     () => Object.fromEntries(initialNodes.map(n => [n.id, n.weight])),
     [initialNodes]
   );
   
-  const renderGeneratedGraph = useCallback((graphData) => {
+  const renderGeneratedGraph = useCallback((graphData) => { // Renderizza il grafo generato
     if (!graphData || !Array.isArray(graphData.nodes) || !Array.isArray(graphData.transitions)) {
       console.error('Invalid graph data:', graphData);
       alert('The graph data is invalid. Please check the backend.');
@@ -826,7 +825,7 @@ const nodeConnections = useMemo(() => {
 
   }, [weightLabels, initialNodeMap]);
 
-  const handleExecutePythonSimulation = async () => {
+  const handleExecutePythonSimulation = async () => { // Esegue il codice Python per la simulazione
     if (!filteredGraphData || !filteredGraphData.nodes) {
       alert('Graph data is not properly loaded. Please try again.');
       return;
