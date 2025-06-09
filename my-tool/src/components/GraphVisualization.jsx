@@ -4,10 +4,10 @@ import { prepareGraphData} from '../utils/graphUtils';
 import ElementsList from './ElementsList';
 
 const GraphVisualization = ({ graphData }) => {
-  const [shouldAnimate, setShouldAnimate] = useState(true);
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [selectedZone, setSelectedZone] = useState(null);
-  const [generatedGraphData, setGeneratedGraphData] = useState(null);
+  const [shouldAnimate, setShouldAnimate] = useState(true); 
+  const [selectedNode, setSelectedNode] = useState(null); 
+  const [selectedZone, setSelectedZone] = useState(null); 
+  const [generatedGraphData, setGeneratedGraphData] = useState(null); 
   const [filteredGraphData, setFilteredGraphData] = useState({ // Stato per i dati del grafo filtrato
     nodes: graphData.nodes || [],
     transitions: graphData.transitions || [],
@@ -20,12 +20,14 @@ const GraphVisualization = ({ graphData }) => {
       return acc;
     }, {})
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);  
   const [showGeneratedGraph, setShowGeneratedGraph] = useState(false);
   const [selectedGlobalWeight, setSelectedGlobalWeight] = useState('NA');
   const [generatedGraphMode, setGeneratedGraphMode] = useState(null); 
   const [colorVersion, setColorVersion] = useState(0);
   const generatedGraphRef = useRef(null);
+  const [weightsDescription, setWeightsDescription] = useState({});
+  const [showInfoSidebar, setShowInfoSidebar] = useState(false);
   
   const [initialNodes, setInitialNodes] = useState(() =>  // Inizializza i nodi iniziali con i dati del grafo
   graphData.nodes.map(node => ({
@@ -37,6 +39,10 @@ const GraphVisualization = ({ graphData }) => {
     meanings: node.meanings || [],
   }))
 );
+
+useEffect(() => { // Aggiorna la descrizione dei pesi quando i dati del grafo cambiano
+  if (graphData.weights) setWeightsDescription(graphData.weights);
+}, [graphData]);
 
 useEffect(() => { // Inizializza i nodi iniziali quando il grafo cambia
   setInitialNodes(
@@ -767,11 +773,16 @@ const nodeConnections = useMemo(() => { // Crea un oggetto che mappa gli ID dei 
         const initialLabel = weightLabels[initialWeight] || initialWeight;
         const currentLabel = weightLabels[currentWeight] || currentWeight || 'N/A';
         let html = `<strong>ID:</strong> ${d.id}<br>`;
-        if (initialWeight && initialWeight !== currentWeight) {
+        if (
+          generatedGraphMode === 'inference' &&
+          d.role === 'final' &&
+          initialWeight &&
+          initialWeight !== currentWeight
+        ) {
           html += `<strong>Initial Weight:</strong> ${initialLabel}<br>`;
           html += `<strong>Current Weight:</strong> ${currentLabel}<br>`;
         } else {
-          html += `<strong>Weight:</strong> ${currentLabel}<br>`;
+          html += `<strong>Current Weight:</strong> ${currentLabel}<br>`;
         }
         html += `<strong>Numeric Weight:</strong> ${d.numeric_weight || 'N/A'}`;
         tooltip
@@ -823,7 +834,7 @@ const nodeConnections = useMemo(() => { // Crea un oggetto che mappa gli ID dei 
         .attr('y', d => d.y - 10);
     });
 
-  }, [weightLabels, initialNodeMap]);
+  }, [weightLabels, initialNodeMap, generatedGraphMode]);
 
   const handleExecutePythonSimulation = async () => { // Esegue il codice Python per la simulazione
     if (!filteredGraphData || !filteredGraphData.nodes) {
@@ -951,11 +962,72 @@ const nodeConnections = useMemo(() => { // Crea un oggetto che mappa gli ID dei 
 
   return (
     <div className="box-container">
+      <div>
+        {/* Pulsante info fisso */}
+        <button
+          onClick={() => setShowInfoSidebar(true)}
+          className="fixed top-4 left-4 z-50 bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-blue-700 transition"
+          title="Show info"
+          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
+        >
+          <span style={{ fontSize: 22, fontWeight: 'bold' }}>i</span>
+        </button>
+
+        {/* Sidebar info */}
+        {showInfoSidebar && (
+        <>
+          {/* Overlay trasparente che chiude la sidebar se cliccato */}
+          <div
+            className="fixed inset-0 z-40 bg-black bg-opacity-10"
+            onClick={() => setShowInfoSidebar(false)}
+          />
+          {/* Sidebar info */}
+          <div
+            className="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 flex flex-col p-6 border-r border-gray-200 animate-slide-in"
+            onClick={e => e.stopPropagation()} // Previene la chiusura se clicchi dentro la sidebar
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-blue-700">How to use the FCM-based Maturity Model</h2>
+              <button
+                onClick={() => setShowInfoSidebar(false)}
+                className="text-gray-500 hover:text-blue-700 text-2xl font-bold"
+                title="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="text-gray-700 text-base leading-relaxed">
+              {/* Sostituisci questo testo con quello definitivo */}
+              <p>
+                This tool allows you to explore and simulate the maturity level of Smart Manufacturing technologies using a Fuzzy Cognitive Map (FCM) model.<br /><br />
+                <strong>How it works:</strong><br />
+                - Select sections to enable or disable parts of the model.<br />
+                - Assign weights to nodes to represent the current state.<br />
+                - Run inference or simulation to see the impact on the system.<br /><br />
+                For more details, refer to the documentation or contact support.
+              </p>
+              <div className="mt-6 max-w-2xl mx-auto bg-blue-50 rounded-lg p-4 shadow">
+                <h3 className="font-bold mb-2 text-blue-700 flex items-center gap-2">
+                  <span role="img" aria-label="info">ℹ️</span> Weight Levels Meaning
+                </h3>
+                <ul className="text-sm text-gray-700 space-y-1">
+                  {Object.entries(weightsDescription).map(([key, desc]) => (
+                    <li key={key}>
+                      <span className="font-semibold">{key}:</span> {desc}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </>
+        )}
+      </div>
       <div id="graph" style={{ width: '100%', height: '400px', border: '1px solid #ccc' }}></div>
 
       {/* Zona pulsanti */}
       <div className="mt-4 bg-white p-4 rounded shadow-md">
-        <h3 className="text-lg font-bold mb-2">Select Area</h3>
+        <h3 className="text-lg font-bold mb-2">Select Section</h3>
         <div className=" zone-buttons flex flex-wrap gap-20">
           {zones.map(zone => (
             <button
@@ -1137,6 +1209,50 @@ const nodeConnections = useMemo(() => { // Crea un oggetto che mappa gli ID dei 
           </div>
           )}
           <div id="generated-graph" className="w-full h-auto"></div>
+          {/* Legenda dettagliata per i pesi */}
+          <div className="flex flex-col items-center mt-4">
+            <span className="font-semibold mb-2">Legend: Weight Levels</span>
+            <div className="overflow-x-auto w-full max-w-2xl">
+              <table className="border-collapse rounded-xl shadow bg-white w-full">
+                <thead>
+                  <tr className="bg-blue-50">
+                    <th className="px-4 py-2 border text-center rounded-tl-xl">Weight</th>
+                    <th className="px-4 py-2 border text-center">Initial State</th>
+                    <th className="px-4 py-2 border text-center">Current State</th>
+                    <th className="px-4 py-2 border text-center rounded-tr-xl">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {['VL', 'L', 'M', 'H', 'VH'].map((w, i) => (
+                    <tr key={w} className={i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                      <td className="px-4 py-2 border text-center font-semibold">{weightLabels[w]}</td>
+                      <td className="px-4 py-2 border text-center">
+                        <span
+                          className="inline-block w-6 h-6 rounded-full border shadow"
+                          style={{
+                            background: getNodeAttributes(w).color,
+                            borderColor: getNodeAttributes(w).color,
+                          }}
+                          title={`Green: ${weightLabels[w]}`}
+                        ></span>
+                      </td>
+                      <td className="px-4 py-2 border text-center">
+                        <span
+                          className="inline-block w-6 h-6 rounded-full border shadow"
+                          style={{
+                            background: getRedNodeAttributes(w).color,
+                            borderColor: getRedNodeAttributes(w).color,
+                          }}
+                          title={`Red: ${weightLabels[w]}`}
+                        ></span>
+                      </td>
+                      <td className="px-4 py-2 border text-left text-xs">{weightsDescription[weightLabels[w]] || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -53,7 +53,7 @@ function App() {
     <div className="max-w-6xl mx-auto">
       {/* Contenitore per il titolo e l'input file */}
       <div className="flex justify-between items-center mb-6 p-4 bg-white rounded shadow-md">
-        <h1 className="text-2xl font-bold text-blue-600">Graph Dashboard</h1>
+        <h1 className="text-2xl font-bold text-blue-600">FCM-based Maturity Model</h1>
         <div className="flex items-center gap-4">
           <input type="file" id="fileInput" className="p-2 border rounded" />
           <button
