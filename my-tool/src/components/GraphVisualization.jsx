@@ -772,19 +772,18 @@ const nodeConnections = useMemo(() => { // Crea un oggetto che mappa gli ID dei 
         const currentWeight = d.weight;
         const initialLabel = weightLabels[initialWeight] || initialWeight;
         const currentLabel = weightLabels[currentWeight] || currentWeight || 'N/A';
-        let html = `<strong>ID:</strong> ${d.id}<br>`;
+        let html = '';
         if (
           generatedGraphMode === 'inference' &&
           d.role === 'final' &&
-          initialWeight &&
-          initialWeight !== currentWeight
+          initialWeight 
         ) {
           html += `<strong>Initial Weight:</strong> ${initialLabel}<br>`;
           html += `<strong>Current Weight:</strong> ${currentLabel}<br>`;
         } else {
           html += `<strong>Current Weight:</strong> ${currentLabel}<br>`;
         }
-        html += `<strong>Numeric Weight:</strong> ${d.numeric_weight || 'N/A'}`;
+        html += `<strong>Current Numeric Weight:</strong> ${d.numeric_weight || 'N/A'}`;
         tooltip
           .style('display', 'block')
           .html(html);
@@ -983,7 +982,7 @@ const nodeConnections = useMemo(() => { // Crea un oggetto che mappa gli ID dei 
           />
           {/* Sidebar info */}
           <div
-            className="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 flex flex-col p-6 border-r border-gray-200 animate-slide-in"
+            className="fixed top-0 left-0 h-full w-80 max-w-full bg-white shadow-2xl z-50 flex flex-col p-6 border-r border-gray-200 animate-slide-in overflow-y-auto max-h-screen"
             onClick={e => e.stopPropagation()} // Previene la chiusura se clicchi dentro la sidebar
           >
             <div className="flex justify-between items-center mb-4">
